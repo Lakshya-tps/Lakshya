@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Detection | Lakshya Project Preview</title>
+    <style>
+        :root {
+            --bg-dark: #06140d;
+            --bg-soft: #0b2015;
+            --panel: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 248, 254, 0.9) 100%);
+            --panel-border: #d8deea;
+            --text-main: #f4fff8;
+            --text-dark: #1f2937;
+            --text-soft: #4b5563;
+            --accent-green: #81f65b;
+            --accent-yellow: #ffd54f;
+            --danger-red: #b91c1c;
+            --success-green: #15803d;
+            --cta-red-start: #dc2626;
+            --cta-red-end: #b91c1c;
+            --shadow-soft: 0 16px 32px rgba(17, 24, 39, 0.07);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 16% -12%, rgba(129, 246, 91, 0.22) 0, rgba(129, 246, 91, 0) 34%),
+                radial-gradient(circle at 84% -8%, rgba(255, 213, 79, 0.22) 0, rgba(255, 213, 79, 0) 36%),
+                linear-gradient(180deg, #030d08 0%, #05130c 46%, #06170e 100%);
+            color: var(--text-main);
+        }
+
+        .topbar {
+            width: min(1160px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 18px 0 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand {
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #e4ffe5;
+            border: 1px solid rgba(226, 255, 231, 0.34);
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .back-link:hover,
+        .back-link:focus-visible {
+            transform: translateY(-1px);
+            border-color: rgba(226, 255, 231, 0.75);
+            background: rgba(226, 255, 231, 0.12);
+            outline: none;
+        }
+
+        .hero-preview {
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+            border-top: 1px solid rgba(145, 196, 153, 0.2);
+            border-bottom: 1px solid rgba(145, 196, 153, 0.22);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            width: min(1160px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 120px 0 88px;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 16px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: rgba(6, 28, 14, 0.72);
+            border: 1px solid rgba(140, 219, 115, 0.48);
+            backdrop-filter: blur(4px);
+        }
+
+        .hero-title {
+            margin: 0 0 16px;
+            max-width: 860px;
+            font-size: clamp(34px, 6.4vw, 66px);
+            line-height: 1.02;
+            letter-spacing: 0.01em;
+            text-wrap: balance;
+        }
+
+        .hero-subtitle {
+            margin: 0 0 28px;
+            max-width: 720px;
+            color: #def8df;
+            font-size: clamp(15px, 2.2vw, 20px);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .point-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            max-width: 920px;
+        }
+
+        .point-card {
+            background: rgba(7, 27, 14, 0.7);
+            border: 1px solid rgba(169, 242, 147, 0.35);
+            border-radius: 14px;
+            padding: 14px;
+            backdrop-filter: blur(5px);
+        }
+
+        .point-card strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #f5ffdf;
+        }
+
+        .point-card span {
+            display: block;
+            color: #d3f8d4;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            z-index: 0;
+            filter: saturate(1.15) contrast(1.05);
+            transform: scale(1.04);
+        }
+
+        .hero-dim {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(3, 9, 7, 0.36) 0%, rgba(3, 9, 7, 0.68) 54%, rgba(2, 8, 6, 0.92) 100%),
+                radial-gradient(circle at 20% 14%, rgba(129, 246, 91, 0.2) 0, rgba(129, 246, 91, 0) 34%);
+            z-index: 1;
+        }
+
+        .main-wrap {
+            width: min(1160px, calc(100% - 32px));
+            margin: -56px auto 72px;
+            position: relative;
+            z-index: 5;
+            display: grid;
+            gap: 18px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            border-radius: 18px;
+            box-shadow: var(--shadow-soft);
+            color: var(--text-dark);
+            padding: clamp(18px, 3.6vw, 30px);
+        }
+
+        .panel h2 {
+            margin: 0 0 10px;
+            font-size: clamp(24px, 4vw, 36px);
+            line-height: 1.15;
+        }
+
+        .panel > p {
+            margin: 0 0 18px;
+            color: var(--text-soft);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .detail-box {
+            border-radius: 14px;
+            border: 1px solid #d8deea;
+            background: #ffffff;
+            padding: 14px;
+            box-shadow: 0 10px 22px rgba(17, 24, 39, 0.06);
+        }
+
+        .detail-box h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: #1f2937;
+        }
+
+        .detail-box p {
+            margin: 0;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.65;
+        }
+
+        .edit-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .edit-box {
+            border-radius: 14px;
+            border: 1px solid #d9dfeb;
+            background: linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 249, 254, 0.88) 100%);
+            padding: 14px;
+        }
+
+        .edit-box h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #1f2937;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .edit-box p {
+            margin: 0;
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.65;
+        }
+
+        .edit-box ul {
+            margin: 10px 0 0;
+            padding-left: 18px;
+            color: #4b5563;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .edit-box li + li {
+            margin-top: 6px;
+        }
+
+        .edit-box.full-span {
+            grid-column: 1 / -1;
+        }
+
+        .form-note {
+            margin: 0 0 16px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .status {
+            border-radius: 10px;
+            padding: 11px 12px;
+            margin: 0 0 14px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #ecfdf3;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .status.error {
+            background: #fff0f0;
+            border: 1px solid #ffc7c7;
+            color: #8b1e1e;
+        }
+
+        .request-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 11px 12px;
+            background: #ffffff;
+            color: #111827;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .field textarea {
+            min-height: 112px;
+            resize: vertical;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: #1f2937;
+            box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
+        }
+
+        .request-btn {
+            grid-column: 1 / -1;
+            appearance: none;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--cta-red-start) 0%, var(--cta-red-end) 100%);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .request-btn:hover,
+        .request-btn:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 28px rgba(185, 28, 28, 0.3);
+            outline: none;
+        }
+
+        .accent {
+            color: #b91c1c;
+            font-weight: 700;
+        }
+
+        @media (max-width: 980px) {
+            .hero-content {
+                padding: 104px 0 72px;
+            }
+
+            .point-grid,
+            .detail-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 680px) {
+            .topbar {
+                width: calc(100% - 24px);
+                padding-top: 14px;
+            }
+
+            .hero-preview {
+                min-height: 92vh;
+            }
+
+            .hero-content {
+                width: calc(100% - 24px);
+                padding: 84px 0 56px;
+            }
+
+            .point-grid,
+            .detail-grid,
+            .edit-grid,
+            .request-form {
+                grid-template-columns: 1fr;
+            }
+
+            .main-wrap {
+                width: calc(100% - 24px);
+                margin: -36px auto 56px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">Lakshya Project Gallery</div>
+        <a class="back-link" href="/">Back to Home</a>
+    </header>
+
+    <section class="hero-preview">
+        <div class="hero-content">
+            <p class="hero-tag">Live Demo Product Preview</p>
+            <h1 class="hero-title">CropSight - Crop Disease Detection System</h1>
+            <p class="hero-subtitle">
+                CropSight is an agricultural support system that detects crop diseases from leaf images and provides farmers with actionable recommendations to protect crop health and reduce yield loss.
+            </p>
+
+            <div class="point-grid">
+                <article class="point-card">
+                    <strong>Leaf Image Based Detection</strong>
+                    <span>Users upload crop leaf images through a simple web interface for fast disease screening.</span>
+                </article>
+                <article class="point-card">
+                    <strong>Disease Type + Confidence</strong>
+                    <span>The deep learning model identifies healthy or diseased crops and returns confidence score.</span>
+                </article>
+                <article class="point-card">
+                    <strong>Treatment Recommendations</strong>
+                    <span>Detected conditions are mapped to pesticide, organic, and field-practice suggestions.</span>
+                </article>
+            </div>
+        </div>
+
+        <video class="hero-video" src="/static/vedios/sample_project1.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        <div class="hero-dim"></div>
+    </section>
+
+    <main class="main-wrap">
+        <section class="panel">
+            <h2>CropSight Project Overview</h2>
+            <p>
+                The application preprocesses uploaded leaf images and passes them through a trained computer-vision model
+                to classify crop condition, identify disease symptoms, and provide confidence-backed output.
+            </p>
+
+            <div class="detail-grid">
+                <article class="detail-box">
+                    <h3>Disease Detection Workflow</h3>
+                    <p>Image upload, preprocessing, deep learning inference, and result display are connected in a single web flow.</p>
+                </article>
+                <article class="detail-box">
+                    <h3>Recommendation Engine</h3>
+                    <p>Based on disease type, the system generates treatment suggestions including pesticides, organic options, and field management practices.</p>
+                </article>
+                <article class="detail-box">
+                    <h3>Sustainable Farming Impact</h3>
+                    <p>Early disease detection and preventive advisories help farmers take timely action and reduce crop loss.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Detailed Project Description</h2>
+            <p>
+                The architecture includes an image upload interface, preprocessing module, machine learning classifier,
+                result visualization dashboard, and recommendation engine for practical agricultural support.
+            </p>
+
+            <div class="edit-grid">
+                <article class="edit-box">
+                    <h3>System Scope and Objective (Editable)</h3>
+                    <p>
+                        CropSight combines computer vision, machine learning, and agricultural domain knowledge to identify crop diseases from leaf images and support informed decisions in the field.
+                    </p>
+                </article>
+                <article class="edit-box">
+                    <h3>Prediction and Treatment Flow (Editable)</h3>
+                    <p>
+                        After classifying the crop as healthy or diseased, the system provides confidence score and disease-specific treatment guidance to improve response quality.
+                    </p>
+                </article>
+                <article class="edit-box">
+                    <h3>Weather Alert and Crop Precautions (Editable)</h3>
+                    <p>
+                        The system can integrate weather forecast data to provide preventive guidance before disease outbreaks
+                        or environmental damage occurs.
+                    </p>
+                </article>
+                <article class="edit-box full-span">
+                    <h3>Example Advisory Output (Editable)</h3>
+                    <ul>
+                        <li><strong>High Humidity / Rain Expected:</strong> Increase field ventilation, avoid over-watering, and apply preventive fungicide spray to reduce fungal infections.</li>
+                        <li><strong>High Temperature Forecast:</strong> Ensure proper irrigation during early morning or evening, provide shade protection for sensitive crops, and monitor leaf moisture stress.</li>
+                        <li><strong>Heavy Rainfall Warning:</strong> Improve drainage channels, avoid fertilizer application before rain, and inspect crops for early signs of root rot.</li>
+                        <li><strong>Strong Wind Conditions:</strong> Secure young plants with support structures and avoid pesticide spraying during high wind periods.</li>
+                        <li><strong>Cold Weather / Temperature Drop:</strong> Use protective crop covers, delay irrigation during cold mornings, and monitor plants for frost damage.</li>
+                    </ul>
+                    <p style="margin-top: 10px;">
+                        This feature supports preventive action before disease spread and helps improve sustainable farming outcomes.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Ask Lakshya for This Project</h2>
+            <p class="form-note">
+                Submit this request and it goes through the configured Lakshya email gateway.
+                <span class="accent">Required fields:</span> name, email, and phone.
+            </p>
+
+            {% if request_status == "success" %}
+                <div class="status success">Your request was sent successfully. Lakshya team will contact you soon.</div>
+            {% elif request_status == "missing" %}
+                <div class="status error">Please fill name, email, and phone before submitting.</div>
+            {% elif request_status == "mail_error" %}
+                <div class="status error">Request saved, but email sending failed. Please try again once.</div>
+            {% endif %}
+
+            <form class="request-form" action="/submit-project-interest" method="post">
+                <input type="hidden" name="project_page" value="cropsight-crop-disease-detection">
+                <input type="hidden" name="project_title" value="CropSight - Crop Disease Detection System">
+
+                <div class="field">
+                    <label for="name">Student Name</label>
+                    <input id="name" name="name" type="text" placeholder="Enter your name" required>
+                </div>
+
+                <div class="field">
+                    <label for="email">Email</label>
+                    <input id="email" name="email" type="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="field">
+                    <label for="phone">Phone</label>
+                    <input id="phone" name="phone" type="tel" placeholder="Enter your mobile number" required>
+                </div>
+
+                <div class="field">
+                    <label for="message">Project Requirement</label>
+                    <input id="message" name="message" type="text" placeholder="Need full build, report, and viva prep support">
+                </div>
+
+                <button class="request-btn" type="submit">Ask Lakshya for This Project</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

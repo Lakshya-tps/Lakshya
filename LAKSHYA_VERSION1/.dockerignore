@@ -1,0 +1,13 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+*.env
+.env.*
+data/*.csv
+venv/
+build/
+dist/
+.git
+.gitignore

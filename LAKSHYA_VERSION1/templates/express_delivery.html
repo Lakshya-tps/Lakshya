@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express Delivery – Lakshya</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        (function () {
+            const ua = navigator.userAgent;
+            const isChrome = /Chrome|CriOS/.test(ua) && !/Edg|OPR|SamsungBrowser/.test(ua);
+            if (isChrome) {
+                document.documentElement.classList.add("chrome-browser");
+            }
+        })();
+    </script>
+</head>
+<body>
+
+<header class="site-header express-page-header">
+    <div class="header-inner express-header-inner">
+        <a class="logo" href="{{ url_for('home') }}" aria-label="Go to home page">
+            <img class="logo-mark" src="/static/vedios/logo_symbol.png" alt="Lakshya logo symbol">
+            <span class="logo-text">Lakshya</span>
+        </a>
+    </div>
+</header>
+
+<section class="discussion-intro express-intro">
+    <h1>Express Delivery Roadmap</h1>
+    <p>48-hour structured execution plan followed by an express intake form.</p>
+</section>
+
+<section class="express-roadmap">
+    <div class="express-roadmap-track"></div>
+
+    <article class="express-step step-day1">
+        <div class="express-step-label">Day 1</div>
+        <h2>Foundation & Core Development</h2>
+        <ul>
+            <li>Topic alignment and academic structure setup</li>
+            <li>Implementation guidance and core functionality</li>
+            <li>Initial documentation drafting</li>
+        </ul>
+    </article>
+
+    <article class="express-step step-day2">
+        <div class="express-step-label">Day 2</div>
+        <h2>Completion & Submission Readiness</h2>
+        <ul>
+            <li>Final implementation refinement</li>
+            <li>Complete documentation formatting (IEEE/College format)</li>
+            <li>PPT preparation and viva readiness sheet</li>
+        </ul>
+    </article>
+</section>
+
+{% if submitted %}
+<section class="discussion-form-wrap express-form-wrap">
+    <div class="confirmation">
+        <div class="submission-note">Submitted to Lakshya</div>
+        <h2>Express Request Submitted</h2>
+        <p>Thank you. We’ll contact you shortly with the next steps.</p>
+        {% if notification_warning %}
+        <div class="form-error">{{ notification_warning }}</div>
+        {% endif %}
+        <div class="submitted-details">
+            <p><strong>Name:</strong> {{ payload.name }}</p>
+            <p><strong>Email:</strong> {{ payload.email }}</p>
+            <p><strong>Phone:</strong> {{ payload.phone }}</p>
+            <p><strong>Branch / domain:</strong> {{ payload.branch }}</p>
+            <p><strong>Project title:</strong> {{ payload.project_title }}</p>
+            <p><strong>Deadline:</strong> {{ payload.deadline }}</p>
+            <p><strong>Requirements:</strong> {{ payload.requirements }}</p>
+        </div>
+    </div>
+</section>
+{% else %}
+<section class="discussion-form-wrap express-form-wrap">
+    <div class="discussion-progress">Step 2 of 2 · Express intake form</div>
+    {% if error %}
+    <div class="form-error">{{ error }}</div>
+    {% endif %}
+    <form class="discussion-form express-delivery-form" method="POST" action="/submit-express" novalidate>
+        <div class="form-group">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="name" placeholder="e.g., Your Name" required value="{{ (payload.name if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="e.g., you@example.com" required value="{{ (payload.email if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone number</label>
+            <input type="tel" id="phone" name="phone" placeholder="e.g., XXXXXXXXXX" pattern="^[0-9]{10}$" required value="{{ (payload.phone if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="branch">Branch / domain</label>
+            <input type="text" id="branch" name="branch" placeholder="e.g., CSE / ECE / AI & DS" required value="{{ (payload.branch if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="project_title">Project title</label>
+            <input type="text" id="project_title" name="project_title" placeholder="e.g., Smart Attendance Tracker/ Mention if not confirmed yet" required value="{{ (payload.project_title if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="deadline">Submission deadline</label>
+            <input
+                type="text"
+                id="deadline"
+                value="{{ (payload.deadline if payload else '') or default_deadline or '' }}"
+                readonly
+                aria-readonly="true"
+            >
+            <input
+                type="hidden"
+                name="deadline"
+                value="{{ (payload.deadline if payload else '') or default_deadline or '' }}"
+            >
+            <small style="color:#555; display:block; margin-top:4px;">
+                This date is fixed as per EPS protocol of 48 hours.
+            </small>
+        </div>
+
+        <div class="form-group">
+            <label for="requirements">Detailed requirements</label>
+            <textarea id="requirements" name="requirements" placeholder="Mention implementation scope, docs format, PPT and viva support needs." required>{{ (payload.requirements if payload else '') or '' }}</textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" disabled>Submit Express Request</button>
+    </form>
+</section>
+{% endif %}
+
+<div class="cursor-dot"></div>
+<canvas id="cursor-canvas"></canvas>
+
+<script>
+    const dot = document.querySelector('.cursor-dot');
+    document.addEventListener('mousemove', e => {
+        dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    });
+</script>
+
+<script>
+const canvas = document.getElementById('cursor-canvas');
+const ctx = canvas.getContext('2d');
+
+let points = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+document.addEventListener('mousemove', (e) => {
+    points.push({ x: e.clientX, y: e.clientY, life: 1 });
+
+    if (points.length > 12) {
+        points.shift();
+    }
+});
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+
+    for (let i = 1; i < points.length; i++) {
+        const p1 = points[i - 1];
+        const p2 = points[i];
+
+        ctx.strokeStyle = `rgba(31,41,55,${p2.life})`;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+
+        p2.life -= 0.05;
+    }
+
+    points = points.filter(p => p.life > 0);
+    requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.express-delivery-form');
+        const submitBtn = document.querySelector('.submit-btn');
+
+        if (!form || !submitBtn) return;
+
+        function updateState() {
+            submitBtn.disabled = !form.checkValidity();
+        }
+
+        form.addEventListener('input', updateState);
+        form.addEventListener('change', updateState);
+        updateState();
+    });
+</script>
+
+</body>
+</html>

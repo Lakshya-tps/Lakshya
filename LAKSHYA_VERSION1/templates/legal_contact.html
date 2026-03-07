@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lakshya Privacy, Terms and Contact</title>
+    <style>
+        :root {
+            --bg: #f3f5f9;
+            --card: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --border: #d8deea;
+            --red: #b91c1c;
+            --red-light: #dc2626;
+            --shadow: 0 14px 30px rgba(17, 24, 39, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            color: var(--text-main);
+            background:
+                radial-gradient(circle at 12% -10%, rgba(220, 38, 38, 0.12) 0, rgba(220, 38, 38, 0) 34%),
+                radial-gradient(circle at 85% -12%, rgba(31, 41, 55, 0.12) 0, rgba(31, 41, 55, 0) 36%),
+                var(--bg);
+            min-height: 100vh;
+        }
+
+        .page {
+            width: min(980px, calc(100% - 28px));
+            margin: 40px auto 64px;
+        }
+
+        .top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            gap: 10px;
+        }
+
+        .brand {
+            font-size: clamp(42px, 8vw, 74px);
+            margin: 0;
+            line-height: 1;
+            letter-spacing: 0.01em;
+            color: var(--red);
+            font-weight: 700;
+        }
+
+        .brand-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: clamp(46px, 8vw, 72px);
+            height: clamp(46px, 8vw, 72px);
+            object-fit: contain;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .home-link {
+            text-decoration: none;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            background: var(--card);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .home-link:hover,
+        .home-link:focus-visible {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(17, 24, 39, 0.12);
+            outline: none;
+        }
+
+        .intro {
+            margin: 0 0 16px;
+            font-size: clamp(15px, 2.6vw, 20px);
+            line-height: 1.6;
+            color: var(--text-muted);
+            max-width: 900px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            margin: 0 0 10px;
+            font-size: 22px;
+            color: var(--text-main);
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .contact-email {
+            display: inline-block;
+            margin-top: 12px;
+            color: var(--red);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(185, 28, 28, 0.35);
+        }
+
+        .safety-note {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(185, 28, 28, 0.22);
+            background: rgba(254, 226, 226, 0.55);
+            color: #7f1d1d;
+            font-size: 14px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .page {
+                margin: 26px auto 42px;
+                width: calc(100% - 20px);
+            }
+
+            .top {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .home-link {
+                width: 100%;
+                text-align: center;
+            }
+
+            .brand-wrap {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <div class="top">
+            <div class="brand-wrap">
+                <img class="brand-logo" src="/static/vedios/logo_symbol.png" alt="Lakshya logo symbol">
+                <h1 class="brand">Lakshya</h1>
+            </div>
+            <a class="home-link" href="/">Back to Home</a>
+        </div>
+
+        <p class="intro">
+            Lakshya Privacy, Terms and Contact information in one page for students.
+            We keep your details secure and use them only for project support communication.
+        </p>
+
+        <section class="grid">
+            <article class="card">
+                <h2>Privacy</h2>
+                <p>
+                    Lakshya collects only the details required to respond to your project requests and support queries.
+                    We do not share your phone number or email with anyone.
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>Terms</h2>
+                <p>
+                    Information and guidance provided by Lakshya are for student project support.
+                    Students should review all outputs before final submission and follow their college rules.
+                </p>
+            </article>
+
+            <article class="card">
+                <h2>Contact</h2>
+                <p>
+                    For project assistance, discussion, or support, contact us at:
+                    <a class="contact-email" href="mailto:lakshyatechprojects@gmail.com">lakshyatechprojects@gmail.com</a>
+                </p>
+            </article>
+        </section>
+
+        <div class="safety-note">
+            Lakshya never shares your phone number or email with third parties.
+        </div>
+    </main>
+</body>
+</html>

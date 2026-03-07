@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAKSHYA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        (function () {
+            document.documentElement.classList.add("js-gsap");
+            const ua = navigator.userAgent;
+            const isChrome = /Chrome|CriOS/.test(ua) && !/Edg|OPR|SamsungBrowser/.test(ua);
+            if (isChrome) {
+                document.documentElement.classList.add("chrome-browser");
+            }
+        })();
+    </script>
+</head>
+<body>
+<header class="site-header">
+    <div class="header-inner">
+        <div class="logo">
+            <img class="logo-mark" src="/static/vedios/logo_symbol.png" alt="Lakshya logo symbol">
+            <span class="logo-text">Lakshya</span>
+        </div>
+        <nav class="site-nav">
+            <a href="#home">Home</a>
+            <a href="#projects">Projects</a>
+            <a href="#process">Process</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#success">Success</a>
+            <a href="#discuss">Discuss</a>
+        </nav>
+        <button
+            type="button"
+            class="mobile-nav-toggle"
+            aria-label="Open navigation menu"
+            aria-controls="mobile-nav-overlay"
+            aria-expanded="false"
+        >
+            <span class="mobile-nav-icon" aria-hidden="true">☰</span>
+        </button>
+        <span class="site-version" aria-label="Version 1.0">v1.0</span>
+    </div>
+</header>
+
+<div class="mobile-nav-overlay" id="mobile-nav-overlay" aria-hidden="true">
+    <nav class="mobile-nav-panel" aria-label="Mobile navigation">
+        <a class="mobile-nav-link" href="#home">Home</a>
+        <a class="mobile-nav-link" href="#projects">Projects</a>
+        <a class="mobile-nav-link" href="#process">Process</a>
+        <a class="mobile-nav-link" href="#pricing">Pricing</a>
+        <a class="mobile-nav-link" href="#success">Success</a>
+        <a class="mobile-nav-link" href="#discuss">Discuss</a>
+    </nav>
+</div>
+
+
+
+
+<section class="hero" id="home">
+    <div class="hero-text">
+        <h1>
+            We Make.<br>
+            We Document.<br>
+            We Deploy.<br>
+            You Present.
+        </h1>
+        <p>
+            Structured academic support to help you build your project the right way —
+            and present it with confidence.
+        </p>
+        <a href="/begin-discussion" class="cta-btn">Discuss My Project</a>
+    </div>
+    <div class="hero-visual">
+    <div class="video-placeholder">
+        <video class="hero-video" src="/static/vedios/main_amma.mp4" autoplay muted loop playsinline preload="metadata"></video>
+        
+    </div>
+</div>
+
+</section>
+<section class="express" id="express">
+    <div class="express-inner">
+        <div class="express-text">
+            <h2>Express Project Submission – 48H Structured Delivery</h2>
+            <p>Deadline in 2 days? We help you plan, implement, document, and prepare — confidently.</p>
+        </div>
+        <a class="express-btn" href="/express-delivery">GO</a>
+    </div>
+</section>
+
+
+<div class="cursor-dot"></div>
+<canvas id="cursor-canvas"></canvas>
+
+<script>
+(() => {
+    const dot = document.querySelector('.cursor-dot');
+    const canvas = document.getElementById('cursor-canvas');
+    if (!dot || !canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let points = [];
+    let overlayScale = 1;
+    const desktopQuery = window.matchMedia('(min-width: 1024px)');
+
+    function readOverlayScale() {
+        const zoomValue = Number.parseFloat(getComputedStyle(document.body).zoom);
+        overlayScale = Number.isFinite(zoomValue) && zoomValue > 0 ? zoomValue : 1;
+    }
+
+    function mapPointerToOverlay(clientX, clientY) {
+        return {
+            x: clientX / overlayScale,
+            y: clientY / overlayScale
+        };
+    }
+
+    function resizeCanvas() {
+        readOverlayScale();
+        canvas.width = Math.round(window.innerWidth / overlayScale);
+        canvas.height = Math.round(window.innerHeight / overlayScale);
+        points = points.filter(point => point.x <= canvas.width && point.y <= canvas.height);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        const { x, y } = mapPointerToOverlay(e.clientX, e.clientY);
+        dot.style.left = `${x}px`;
+        dot.style.top = `${y}px`;
+
+        points.push({ x, y, life: 1 });
+        if (points.length > 12) {
+            points.shift();
+        }
+    }, { passive: true });
+
+    window.addEventListener('resize', resizeCanvas);
+    if (typeof desktopQuery.addEventListener === 'function') {
+        desktopQuery.addEventListener('change', resizeCanvas);
+    } else if (typeof desktopQuery.addListener === 'function') {
+        desktopQuery.addListener(resizeCanvas);
+    }
+
+    resizeCanvas();
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 1;
+        ctx.lineCap = 'round';
+
+        for (let i = 1; i < points.length; i++) {
+            const p1 = points[i - 1];
+            const p2 = points[i];
+
+            ctx.strokeStyle = `rgba(31,41,55,${p2.life})`;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+
+            p2.life -= 0.05;
+        }
+
+        points = points.filter(point => point.life > 0);
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+})();
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const header = document.querySelector('.site-header');
+        const navLinks = Array.from(document.querySelectorAll('.site-nav a[href^="#"]'));
+        const trackedSections = navLinks
+            .map(link => document.querySelector(link.getAttribute('href')))
+            .filter(Boolean);
+
+        if (!header || !navLinks.length) return;
+
+        function setActiveNav(sectionId) {
+            navLinks.forEach(link => {
+                const isActive = link.getAttribute('href') === `#${sectionId}`;
+                link.classList.toggle('active', isActive);
+            });
+        }
+
+        function updateHeaderAndNavState() {
+            if (window.scrollY > 48) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+
+            if (!trackedSections.length) return;
+
+            const probeY = window.scrollY + header.offsetHeight + 120;
+            const sortedSections = [...trackedSections].sort((a, b) => a.offsetTop - b.offsetTop);
+            let activeSectionId = sortedSections[0].id;
+
+            sortedSections.forEach(section => {
+                if (section.offsetTop <= probeY) {
+                    activeSectionId = section.id;
+                }
+            });
+
+            setActiveNav(activeSectionId);
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', event => {
+                const targetSelector = link.getAttribute('href');
+                if (!targetSelector || targetSelector === '#') return;
+
+                const targetSection = document.querySelector(targetSelector);
+                if (!targetSection) return;
+
+                event.preventDefault();
+                const headerOffset = header.offsetHeight;
+                const top = targetSection.getBoundingClientRect().top + window.scrollY - headerOffset + 8;
+                window.scrollTo({
+                    top: Math.max(top, 0),
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        window.addEventListener('scroll', updateHeaderAndNavState, { passive: true });
+        window.addEventListener('resize', updateHeaderAndNavState);
+        updateHeaderAndNavState();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const body = document.body;
+        const toggleButton = document.querySelector('.mobile-nav-toggle');
+        const overlay = document.querySelector('.mobile-nav-overlay');
+        if (!body || !toggleButton || !overlay) return;
+
+        const mobileBreakpoint = window.matchMedia('(max-width: 768px)');
+        const menuLinks = Array.from(overlay.querySelectorAll('a'));
+        let lastFocusedElement = null;
+
+        function isMenuOpen() {
+            return body.classList.contains('mobile-nav-open');
+        }
+
+        function setMenuState(open) {
+            body.classList.toggle('mobile-nav-open', open);
+            toggleButton.classList.toggle('is-open', open);
+            toggleButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+            toggleButton.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+            overlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+
+            if (open) {
+                lastFocusedElement = document.activeElement;
+                const firstMenuLink = overlay.querySelector('.mobile-nav-link');
+                if (firstMenuLink) {
+                    window.setTimeout(() => firstMenuLink.focus(), 60);
+                }
+                return;
+            }
+
+            if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+                window.setTimeout(() => lastFocusedElement.focus(), 0);
+            }
+        }
+
+        toggleButton.addEventListener('click', () => {
+            setMenuState(!isMenuOpen());
+        });
+
+        overlay.addEventListener('click', event => {
+            if (event.target === overlay) {
+                setMenuState(false);
+            }
+        });
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                setMenuState(false);
+            });
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && isMenuOpen()) {
+                setMenuState(false);
+            }
+        });
+
+        const closeOnDesktop = () => {
+            if (!mobileBreakpoint.matches && isMenuOpen()) {
+                setMenuState(false);
+            }
+        };
+
+        if (typeof mobileBreakpoint.addEventListener === 'function') {
+            mobileBreakpoint.addEventListener('change', closeOnDesktop);
+        } else if (typeof mobileBreakpoint.addListener === 'function') {
+            mobileBreakpoint.addListener(closeOnDesktop);
+        }
+    });
+</script>
+
+<section class="flow-preview" id="process">
+    <div class="flow-header">
+        <h2><b>Flair that gives you everything</b></h2>
+        <p>
+            A structured view of how project discussion moves from idea to clarity.
+        </p>
+    </div>
+
+    <div class="flow-card">
+        <div class="flow-sidebar" role="tablist" aria-label="Workflow phases">
+            <button type="button" class="flow-item active" role="tab" aria-selected="true" data-step="0">Project Idea</button>
+            <button type="button" class="flow-item" role="tab" aria-selected="false" data-step="1">Requirements</button>
+            <button type="button" class="flow-item" role="tab" aria-selected="false" data-step="2">Documentation</button>
+            <button type="button" class="flow-item" role="tab" aria-selected="false" data-step="3">Review</button>
+            <button type="button" class="flow-item" role="tab" aria-selected="false" data-step="4">Deploy</button>
+        </div>
+
+        <div class="flow-main">
+            <div class="flow-main-content">
+                <div class="flow-progress" aria-label="Workflow progress">
+                    <div class="flow-progress-step active" data-step="0">
+                        <span class="flow-progress-dot" aria-hidden="true"></span>
+                        <span class="flow-progress-label">Project Idea</span>
+                        <span class="flow-progress-line" aria-hidden="true"></span>
+                    </div>
+                    <div class="flow-progress-step" data-step="1">
+                        <span class="flow-progress-dot" aria-hidden="true"></span>
+                        <span class="flow-progress-label">Requirements</span>
+                        <span class="flow-progress-line" aria-hidden="true"></span>
+                    </div>
+                    <div class="flow-progress-step" data-step="2">
+                        <span class="flow-progress-dot" aria-hidden="true"></span>
+                        <span class="flow-progress-label">Documentation</span>
+                        <span class="flow-progress-line" aria-hidden="true"></span>
+                    </div>
+                    <div class="flow-progress-step" data-step="3">
+                        <span class="flow-progress-dot" aria-hidden="true"></span>
+                        <span class="flow-progress-label">Review</span>
+                        <span class="flow-progress-line" aria-hidden="true"></span>
+                    </div>
+                    <div class="flow-progress-step" data-step="4">
+                        <span class="flow-progress-dot" aria-hidden="true"></span>
+                        <span class="flow-progress-label">Deploy</span>
+                    </div>
+                </div>
+
+                <div class="flow-placeholder">
+                    <div class="flow-typing-shell" aria-live="polite">
+                        <div class="flow-typing-head">
+                            <span class="flow-typing-dots" aria-hidden="true">
+                                <span class="flow-typing-dot"></span>
+                                <span class="flow-typing-dot"></span>
+                                <span class="flow-typing-dot"></span>
+                            </span>
+                            <span class="flow-typing-title">Project Idea</span>
+                        </div>
+                        <div class="flow-typing-body">
+                            <p class="flow-typing-text"></p>
+                            <span class="flow-typing-caret" aria-hidden="true"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-detail-grid">
+                    <aside class="flow-tip-card" aria-live="polite">
+                        <span class="flow-tip-label">Pro Tip</span>
+                        <p class="flow-tip-text"></p>
+                    </aside>
+                </div>
+
+                <button type="button" class="flow-next-btn">Proceed</button>
+
+                <section class="flow-mistakes">
+                    <button type="button" class="flow-accordion-toggle" aria-expanded="false">
+                        Common Mistakes
+                        <span class="flow-accordion-icon" aria-hidden="true">+</span>
+                    </button>
+                    <div class="flow-accordion-panel">
+                        <ul class="flow-mistakes-list"></ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    (function () {
+        const flowRoot = document.querySelector('.flow-preview');
+        if (!flowRoot) return;
+
+        const workflowSteps = [
+            {
+                key: "project-idea",
+                label: "Project Idea",
+                typingText:
+                    "Problem statement: Pick one focused use-case with measurable impact.\n" +
+                    "Feasibility check: Validate timeline, tools, and data availability.\n" +
+                    "Scope lock: Freeze must-have features before coding begins.",
+                takeaways: [
+                    "Define one clear problem statement with a measurable outcome.",
+                    "Confirm feasibility with your timeline, tools, and data access.",
+                    "Freeze scope before moving into technical implementation."
+                ],
+                tip: "Start with a one-page concept note so your guide can approve direction quickly.",
+                mistakes: [
+                    "Choosing a broad topic without narrowing to a specific use case.",
+                    "Starting implementation before validating feasibility constraints."
+                ]
+            },
+            {
+                key: "requirements",
+                label: "Requirements",
+                typingText:
+                    "Requirement split: Separate functional and non-functional points.\n" +
+                    "Module mapping: Attach each requirement to one planned output.\n" +
+                    "Milestone order: Lock dependencies to avoid last-minute blockers.",
+                takeaways: [
+                    "List functional and non-functional requirements separately.",
+                    "Map each requirement to one planned output or module.",
+                    "Lock milestones to avoid last-minute dependency issues."
+                ],
+                tip: "Prioritize must-have deliverables first, then add optional enhancements.",
+                mistakes: [
+                    "Mixing optional features with mandatory submission requirements.",
+                    "Ignoring integration dependencies between modules."
+                ]
+            },
+            {
+                key: "documentation",
+                label: "Documentation",
+                typingText:
+                    "Structure check: Match the report with your college format.\n" +
+                    "Architecture clarity: Use concise flow and module explanations.\n" +
+                    "Naming consistency: Keep report, diagrams, and code aligned.",
+                takeaways: [
+                    "Keep report structure aligned with your college format rules.",
+                    "Document architecture and flow with concise, visual explanations.",
+                    "Use consistent naming between code, diagrams, and report."
+                ],
+                tip: "Prepare figures and tables while building to reduce end-stage rush.",
+                mistakes: [
+                    "Writing documentation after completion without technical traceability.",
+                    "Using inconsistent terminology across report and presentation."
+                ]
+            },
+            {
+                key: "review",
+                label: "Review",
+                typingText:
+                    "Final walkthrough: Validate output, report, and presentation sequence.\n" +
+                    "Rubric pass: Cross-check every scoring item before submission.\n" +
+                    "Defense prep: Keep short answers ready for design decisions.",
+                takeaways: [
+                    "Run a final walkthrough of output, report, and presentation flow.",
+                    "Cross-check evaluation rubric items one by one.",
+                    "Prepare short defense answers for architecture and decisions."
+                ],
+                tip: "Simulate a mini viva before submission to spot weak explanation points.",
+                mistakes: [
+                    "Skipping final dry-run and discovering issues on review day.",
+                    "Not preparing concise answers for design tradeoff questions."
+                ]
+            },
+            {
+                key: "deploy",
+                label: "Deploy",
+                typingText:
+                    "Packaging check: Keep all project files and dependencies reproducible.\n" +
+                    "Submission run: Validate final build, report links, and references.\n" +
+                    "Handoff clarity: Ensure demo flow works exactly as presented.",
+                takeaways: [
+                    "Package source, assets, and setup notes in one reproducible bundle.",
+                    "Run a final submission check for build output and reference links.",
+                    "Keep your demo handoff sequence identical to your presentation."
+                ],
+                tip: "Create a final release folder with versioned files to avoid last-minute confusion.",
+                mistakes: [
+                    "Submitting unverified files that differ from your presentation demo.",
+                    "Skipping environment/setup notes needed to run the project."
+                ]
+            }
+        ];
+
+        const flowItems = Array.from(flowRoot.querySelectorAll('.flow-item'));
+        const progressSteps = Array.from(flowRoot.querySelectorAll('.flow-progress-step'));
+        const flowMainContent = flowRoot.querySelector('.flow-main-content');
+        const flowTypingTitle = flowRoot.querySelector('.flow-typing-title');
+        const flowTypingText = flowRoot.querySelector('.flow-typing-text');
+        const flowTipText = flowRoot.querySelector('.flow-tip-text');
+        const flowNextButton = flowRoot.querySelector('.flow-next-btn');
+        const flowAccordionToggle = flowRoot.querySelector('.flow-accordion-toggle');
+        const flowAccordionPanel = flowRoot.querySelector('.flow-accordion-panel');
+        const flowMistakesList = flowRoot.querySelector('.flow-mistakes-list');
+
+        if (!flowTypingText || !flowTipText || !flowMistakesList) return;
+
+        const state = {
+            activeStep: 0,
+            isTransitioning: false,
+            accordionOpen: false,
+            typingToken: 0,
+            typingTimer: null
+        };
+
+        function renderAnimatedList(listElement, items) {
+            listElement.innerHTML = "";
+            items.forEach((text, index) => {
+                const listItem = document.createElement("li");
+                listItem.className = "flow-reveal-item";
+                listItem.style.animationDelay = `${index * 90}ms`;
+                listItem.textContent = text;
+                listElement.appendChild(listItem);
+            });
+        }
+
+        function setAccordion(open) {
+            state.accordionOpen = open;
+            flowAccordionToggle.setAttribute("aria-expanded", open ? "true" : "false");
+            flowAccordionPanel.classList.toggle("open", open);
+
+            if (open) {
+                flowAccordionPanel.style.maxHeight = `${flowAccordionPanel.scrollHeight}px`;
+            } else {
+                flowAccordionPanel.style.maxHeight = "0px";
+            }
+        }
+
+        function typeIntoFlowBox(text) {
+            state.typingToken += 1;
+            const activeToken = state.typingToken;
+
+            if (state.typingTimer) {
+                window.clearTimeout(state.typingTimer);
+                state.typingTimer = null;
+            }
+
+            const content = text || "";
+            flowTypingText.textContent = "";
+
+            let index = 0;
+            const typeNext = () => {
+                if (activeToken !== state.typingToken) return;
+
+                flowTypingText.textContent = content.slice(0, index);
+                if (index >= content.length) return;
+
+                const currentChar = content.charAt(index);
+                index += 1;
+
+                let delay = 24;
+                if (currentChar === " ") delay = 14;
+                if (/[.,:;!?]/.test(currentChar)) delay = 62;
+                if (currentChar === "\n") delay = 88;
+
+                state.typingTimer = window.setTimeout(typeNext, delay);
+            };
+
+            typeNext();
+        }
+
+        function updateStepUI(stepIndex) {
+            const step = workflowSteps[stepIndex];
+
+            flowItems.forEach((item, index) => {
+                const isActive = index === stepIndex;
+                item.classList.toggle("active", isActive);
+                item.setAttribute("aria-selected", isActive ? "true" : "false");
+            });
+
+            progressSteps.forEach((progressItem, index) => {
+                progressItem.classList.toggle("active", index === stepIndex);
+                progressItem.classList.toggle("complete", index < stepIndex);
+            });
+
+            if (flowTypingTitle) {
+                flowTypingTitle.textContent = step.label;
+            }
+            typeIntoFlowBox(step.typingText);
+
+            renderAnimatedList(flowMistakesList, step.mistakes);
+            flowTipText.textContent = step.tip;
+
+            const nextStep = (stepIndex + 1) % workflowSteps.length;
+            const nextLabel = workflowSteps[nextStep].label;
+            const buttonText = stepIndex === workflowSteps.length - 1
+                ? "Restart from Project Idea \u2192"
+                : `Proceed to ${nextLabel} \u2192`;
+            flowNextButton.textContent = buttonText;
+            flowNextButton.dataset.nextStep = String(nextStep);
+
+            if (state.accordionOpen) {
+                requestAnimationFrame(() => setAccordion(true));
+            }
+        }
+
+        function switchStep(nextIndex, options = {}) {
+            const immediate = Boolean(options.immediate);
+            if (nextIndex === state.activeStep) return;
+            if (nextIndex < 0 || nextIndex >= workflowSteps.length) return;
+            if (state.isTransitioning && !immediate) return;
+
+            if (immediate) {
+                state.isTransitioning = false;
+                flowMainContent.classList.remove("is-leaving", "is-entering", "is-entered");
+                state.activeStep = nextIndex;
+                updateStepUI(nextIndex);
+                return;
+            }
+
+            state.isTransitioning = true;
+            flowMainContent.classList.add("is-leaving");
+
+            window.setTimeout(() => {
+                state.activeStep = nextIndex;
+                updateStepUI(nextIndex);
+                flowMainContent.classList.remove("is-leaving");
+                flowMainContent.classList.add("is-entering");
+
+                requestAnimationFrame(() => {
+                    flowMainContent.classList.add("is-entered");
+                });
+
+                window.setTimeout(() => {
+                    flowMainContent.classList.remove("is-entering", "is-entered");
+                    state.isTransitioning = false;
+                }, 280);
+            }, 220);
+        }
+
+        flowRoot.__setStep = (stepIndex) => {
+            switchStep(stepIndex, { immediate: true });
+        };
+
+        flowItems.forEach((item, index) => {
+            item.addEventListener("click", () => switchStep(index));
+        });
+
+        flowNextButton.addEventListener("click", () => {
+            const nextStep = Number(flowNextButton.dataset.nextStep || "0");
+            switchStep(nextStep);
+        });
+
+        flowAccordionToggle.addEventListener("click", () => {
+            setAccordion(!state.accordionOpen);
+        });
+
+        window.addEventListener("resize", () => {
+            if (state.accordionOpen) {
+                setAccordion(true);
+            }
+        }, { passive: true });
+
+        updateStepUI(state.activeStep);
+        setAccordion(false);
+    })();
+</script>
+
+<section class="how-lakshya-works" id="how-lakshya-works">
+    <div class="section-shell">
+        <div class="section-head">
+            <span class="section-tag">How Lakshya Works</span>
+            <h2>From project idea to final presentation in four clear steps</h2>
+            <p>Built like a guided SaaS workflow so you always know what comes next.</p>
+        </div>
+
+        <div class="works-timeline">
+            <article class="works-card">
+                <span class="works-step-index">01</span>
+                <h3>Submit Idea</h3>
+                <p>Share your topic, objective, and timeline so we can map the right project direction.</p>
+            </article>
+            <span class="works-arrow" aria-hidden="true">→</span>
+            <article class="works-card">
+                <span class="works-step-index">02</span>
+                <h3>Plan Architecture</h3>
+                <p>Get a practical architecture with modules, milestones, and deliverable checkpoints.</p>
+            </article>
+            <span class="works-arrow" aria-hidden="true">→</span>
+            <article class="works-card">
+                <span class="works-step-index">03</span>
+                <h3>Implementation Support</h3>
+                <p>Receive guided coding support, debugging help, and integration assistance.</p>
+            </article>
+            <span class="works-arrow" aria-hidden="true">→</span>
+            <article class="works-card">
+                <span class="works-step-index">04</span>
+                <h3>Documentation + PPT + Viva Preparation</h3>
+                <p>Finish with report structure, presentation readiness, and viva defense confidence.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="student-proof" id="success">
+    <div class="section-shell">
+        <div class="section-head">
+            <span class="section-tag">Student Success</span>
+            <h2>Built on outcomes students can trust</h2>
+            <p>Proof from real project journeys across idea, implementation, and final viva.</p>
+        </div>
+
+        <div class="proof-stats-grid">
+            <article class="proof-stat-card">
+                <h3 class="proof-stat-value" data-counter-target="38">38+</h3>
+                <p>Projects Guided</p>
+            </article>
+            <article class="proof-stat-card">
+                <h3 class="proof-stat-value" data-counter-target="150">150+</h3>
+                <p>Students Helped</p>
+            </article>
+            <article class="proof-stat-card">
+                <h3 class="proof-stat-value" data-counter-target="48">48 Hour</h3>
+                <p>Express Delivery</p>
+            </article>
+            <article class="proof-stat-card">
+                <h3 class="proof-stat-value" data-counter-target="95">95%</h3>
+                <p>Viva Success Rate</p>
+            </article>
+        </div>
+
+        <div class="testimonial-grid">
+            <article class="testimonial-card">
+                <div class="testimonial-stars" aria-label="5 star rating">★★★★★</div>
+                <p>"The structure made my final-year process predictable. I actually understood every module before viva."</p>
+                <span>Priya S. — CSE Final Year</span>
+            </article>
+            <article class="testimonial-card">
+                <div class="testimonial-stars" aria-label="5 star rating">★★★★★</div>
+                <p>"Express mode saved my deadline. The implementation and report alignment was exactly what my panel expected."</p>
+                <span>Rohit K. — ECE Student</span>
+            </article>
+            <article class="testimonial-card">
+                <div class="testimonial-stars" aria-label="4 star rating">★★★★☆</div>
+                <p>"Best part was viva prep. The mock questions and architecture explanation made defense much easier."</p>
+                <span>Meghana R. — IT Student</span>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="live-demo" id="projects">
+    <div class="section-shell">
+        <div class="section-head">
+            <span class="section-tag">Live Project Demos</span>
+            <h2>Explore interactive project experiences before you choose</h2>
+            <p>Preview real project flows and assess the output quality before discussion.</p>
+        </div>
+
+        <div class="demo-grid">
+            <article class="demo-card">
+                <div class="demo-preview">
+                    <video class="demo-video" src="/static/vedios/sample_project1.mp4" autoplay muted loop playsinline preload="metadata"></video>
+                </div>
+                <h3>CropSight -Crop Disease Detection</h3>
+                <p>Image-based disease identification with weather-aware preventive recommendations.</p>
+                <div class="demo-actions">
+                    <a href="/cropsight-crop-disease-detection" class="demo-btn">Explore Project</a>
+                </div>
+            </article>
+
+            <article class="demo-card">
+                <div class="demo-preview">
+                    <video class="demo-video" src="/static/vedios/sample_project2.mp4" autoplay muted loop playsinline preload="metadata"></video>
+                </div>
+                <h3>VITA - AI Health Monitoring</h3>
+                <p>Live health signal insights with alert workflows and suggested response guidance.</p>
+                <div class="demo-actions">
+                    <a href="/vita-ai-health-monitoring" class="demo-btn">Explore Project</a>
+                </div>
+            </article>
+
+            <article class="demo-card">
+                <div class="demo-preview">
+                    <video class="demo-video" src="/static/vedios/sample_project3.mp4" autoplay muted loop playsinline preload="metadata"></video>
+                </div>
+                <h3>NueroVista - ML Visualization</h3>
+                <p>Interactive model visualization that explains ML behavior for reports and viva.</p>
+                <div class="demo-actions">
+                    <a href="/nuerovista-ml-visualization" class="demo-btn">Explore Project</a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="pricing-plans" id="pricing">
+    <div class="section-shell">
+        <div class="section-head">
+            <span class="section-tag">Pricing</span>
+            <h2>Choose the support depth that matches your project stage</h2>
+            <p>Transparent plans designed for idea stage, full builds, and urgent delivery timelines.</p>
+        </div>
+
+        <div class="pricing-grid">
+            <article class="pricing-card">
+                <h3>Starter</h3>
+                <p class="pricing-subtitle">Idea + Documentation</p>
+                <p class="pricing-amount">₹999</p>
+                <ul>
+                    <li>Problem statement refinement</li>
+                    <li>Architecture outline</li>
+                    <li>Report format support</li>
+                </ul>
+                <a href="/begin-discussion" class="pricing-btn">Get Starter</a>
+            </article>
+
+            <article class="pricing-card pricing-card-recommended">
+                <span class="pricing-badge">Recommended</span>
+                <h3>Pro</h3>
+                <p class="pricing-subtitle">Idea + Implementation + Documentation</p>
+                <p class="pricing-amount">₹2999</p>
+                <ul>
+                    <li>Complete technical guidance</li>
+                    <li>Module-level implementation help</li>
+                    <li>Documentation and viva preparation</li>
+                </ul>
+                <a href="/begin-discussion" class="pricing-btn pricing-btn-primary">Get Pro</a>
+            </article>
+
+            <article class="pricing-card">
+                <h3>Express</h3>
+                <p class="pricing-subtitle">48 Hour Delivery + Full Support</p>
+                <p class="pricing-amount">₹4999</p>
+                <ul>
+                    <li>Priority execution track</li>
+                    <li>Rapid implementation assistance</li>
+                    <li>Submission-ready documentation</li>
+                </ul>
+                <a href="/express-delivery" class="pricing-btn">Get Express</a>
+            </article>
+        </div>
+        <p class="pricing-note">Final pricing may vary based on project scope, complexity, and additional requirements.</p>
+    </div>
+</section>
+
+<section class="faq-section" id="faq-section">
+    <div class="section-shell">
+        <div class="section-head">
+            <span class="section-tag">FAQ</span>
+            <h2>Common questions before getting started</h2>
+            <p>Clear answers to help you choose the right support plan quickly.</p>
+        </div>
+
+        <div class="faq-list">
+            <article class="faq-item">
+                <button class="faq-question" type="button" aria-expanded="false">
+                    Is the project plagiarism free?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes. Every project flow is customized by scope and implementation decisions, with original structure and explainable logic.</p>
+                </div>
+            </article>
+            <article class="faq-item">
+                <button class="faq-question" type="button" aria-expanded="false">
+                    Will I understand the code?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes. Lakshya emphasizes guided understanding through module explanations, walkthroughs, and viva-focused breakdowns.</p>
+                </div>
+            </article>
+            <article class="faq-item">
+                <button class="faq-question" type="button" aria-expanded="false">
+                    Can I customize the project?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Absolutely. Features, datasets, and architecture components can be adapted to your college requirements and timeline.</p>
+                </div>
+            </article>
+            <article class="faq-item">
+                <button class="faq-question" type="button" aria-expanded="false">
+                    Do you provide documentation?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes. Documentation support includes report structuring, module explanation consistency, and final submission readiness.</p>
+                </div>
+            </article>
+            <article class="faq-item">
+                <button class="faq-question" type="button" aria-expanded="false">
+                    Is express delivery really 48 hours?
+                    <span aria-hidden="true">+</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Yes for clearly scoped projects. We first validate feasibility, then run a priority plan to deliver within 48 hours.</p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="project-hero final-discuss-cta" id="discuss">
+    <div class="project-hero-panel">
+        <h2>Ready to Build Your Final Year Project?</h2>
+        <p>From idea to implementation and documentation.</p>
+        <a href="/begin-discussion" class="hero-btn">
+            Discuss My Project <span>→</span>
+        </a>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-top">
+        <div class="footer-left">
+            <div class="footer-logo">
+                <img class="logo-mark" src="/static/vedios/logo_symbol.png" alt="Lakshya logo symbol">
+                <span class="logo-text">Lakshya</span>
+            </div>
+
+            <p class="footer-tagline">
+                Structured academic support designed to adapt to your project workflow.
+            </p>
+
+            <div class="footer-socials">
+                <a href="https://www.linkedin.com/in/lakshya-tech-projects-0976013b5/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                    <img src="/static/vedios/LinkedIn_logo_initials.png" alt="LinkedIn">
+                </a>
+                <a href="https://www.instagram.com/lakshyatechprojects/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    <img src="/static/vedios/instagram-application-logo_23-2151544088.jpg.avif" alt="Instagram">
+                </a>
+                <a href="mailto:lakshyatechprojects@gmail.com" aria-label="Email">
+                    <img src="/static/vedios/Gmail_Logo_512px.png" alt="Gmail">
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-right">
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/contact">Contact</a>
+        </div>
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom">
+        <span>© 2026 Lakshya. All rights reserved.</span>
+        <span class="footer-version" aria-label="Version 1.0">v1.0</span>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"></script>
+<script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Discussion – Lakshya</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        (function () {
+            const ua = navigator.userAgent;
+            const isChrome = /Chrome|CriOS/.test(ua) && !/Edg|OPR|SamsungBrowser/.test(ua);
+            if (isChrome) {
+                document.documentElement.classList.add("chrome-browser");
+            }
+        })();
+    </script>
+</head>
+<body>
+
+<header class="site-header">
+    <div class="header-inner">
+        <a class="logo" href="{{ url_for('home') }}" aria-label="Go to home page">
+            <img class="logo-mark" src="/static/vedios/logo_symbol.png" alt="Lakshya logo symbol">
+            <span class="logo-text">Lakshya</span>
+        </a>
+    </div>
+    </header>
+
+<!-- Intro Section -->
+<section class="discussion-intro">
+    <h1>Project Discussion</h1>
+    {% if not submitted %}
+    <p>Fill the short form below and submit.</p>
+    {% endif %}
+</section>
+
+{% if submitted %}
+<section class="discussion-form-wrap">
+    <div class="confirmation">
+        <div class="submission-note">Submitted to Lakshya</div>
+        <h2>Submitted Details</h2>
+        <p>Thank you. We’ll reach out within 2 hours.</p>
+        {% if notification_warning %}
+        <div class="form-error">{{ notification_warning }}</div>
+        {% endif %}
+        <div class="submitted-details">
+            <p><strong>Academic level:</strong> {{ payload.level }}</p>
+            <p><strong>Branch / domain:</strong> {{ payload.branch }}</p>
+            <p><strong>Email:</strong> {{ payload.email }}</p>
+            <p><strong>Phone:</strong> {{ payload.phone }}</p>
+            <p><strong>Current project stage:</strong> {{ payload.stage }}</p>
+            <p><strong>Expected timeline:</strong> {{ payload.timeline }}</p>
+            <p><strong>Problem statement:</strong> {{ payload.problem }}</p>
+        </div>
+    </div>
+</section>
+{% else %}
+<section class="discussion-form-wrap">
+    {% if error %}
+    <div class="form-error">{{ error }}</div>
+    {% endif %}
+    <form class="discussion-form" method="POST" action="/submit-discussion" novalidate>
+
+        <div class="form-group">
+            <label for="level">Academic level</label>
+            <input type="text" id="level" name="level" placeholder="e.g., 3rd year / 4th year" required value="{{ (payload.level if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="branch">Branch / domain</label>
+            <input type="text" id="branch" name="branch" placeholder="e.g., CSE / ECE / AI & DS" required value="{{ (payload.branch if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="e.g., you@example.com" required value="{{ (payload.email if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone number</label>
+            <input type="tel" id="phone" name="phone" placeholder="XXXXXXXXXX" pattern="^[0-9]{10}$" required value="{{ (payload.phone if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="stage">Current project stage</label>
+            <input type="text" id="stage" name="stage" placeholder="e.g., idea, partial implementation, documentation" required value="{{ (payload.stage if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="timeline">Expected submission timeline</label>
+            <input type="text" id="timeline" name="timeline" placeholder="e.g., Prefer if below 3 days try EPS - Express Project Submission" required value="{{ (payload.timeline if payload else '') or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="problem">Brief problem statement</label>
+            <textarea id="problem" name="problem" placeholder="Describe your project in 3–4 lines" required>{{ (payload.problem if payload else '') or '' }}</textarea>
+        </div>
+
+                <button type="submit" class="submit-btn" disabled>Submit</button>
+    </form>
+</section>
+{% endif %}
+
+<div class="cursor-dot"></div>
+<canvas id="cursor-canvas"></canvas>
+
+<script>
+    const dot = document.querySelector('.cursor-dot');
+    document.addEventListener('mousemove', e => {
+        dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+    });
+</script>
+
+<script>
+const canvas = document.getElementById('cursor-canvas');
+const ctx = canvas.getContext('2d');
+
+let points = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+document.addEventListener('mousemove', (e) => {
+    points.push({ x: e.clientX, y: e.clientY, life: 1 });
+
+    if (points.length > 12) {
+        points.shift();
+    }
+});
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+
+    for (let i = 1; i < points.length; i++) {
+        const p1 = points[i - 1];
+        const p2 = points[i];
+
+        ctx.strokeStyle = `rgba(31,41,55,${p2.life})`;
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+
+        p2.life -= 0.05;
+    }
+
+    points = points.filter(p => p.life > 0);
+    requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+<script>
+    // Enable submit only when the form is valid
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('.discussion-form');
+        const submitBtn = document.querySelector('.submit-btn');
+        function updateState() {
+            submitBtn.disabled = !form.checkValidity();
+        }
+        form.addEventListener('input', updateState);
+        form.addEventListener('change', updateState);
+        updateState();
+    });
+</script>
+
+</body>
+</html>
