@@ -41,35 +41,73 @@ from pydantic import ValidationError
 from web3 import Web3
 from werkzeug.exceptions import HTTPException
 
-from blockchain import BlockchainClient
-from database import (
-    clear_all_logs,
-    clear_all_users,
-    delete_user_by_email,
-    delete_identity_document,
-    delete_identity_documents_for_user,
-    get_all_encodings,
-    get_all_users,
-    get_db_connection,
-    get_identity_document,
-    get_identity_document_by_key,
-    get_logs,
-    get_metrics,
-    get_user_by_email,
-    get_user_by_approval_token,
-    init_db,
-    log_event,
-    list_identity_documents,
-    save_user,
-    set_admin_verified,
-    upsert_identity_document,
-    update_user_blockchain_status,
-    update_user_login,
-)
-import email_service
-from email_service import send_registration_email_async
-from face_auth import analyze_face, compare_face, decode_image, find_matching_face
-from schemas import CapturePayload, LoginPayload, RegisterPayload, AdminRegisterPayload, AdminLoginPayload, validation_errors
+if __package__:
+    from .blockchain import BlockchainClient
+    from .database import (
+        clear_all_logs,
+        clear_all_users,
+        delete_user_by_email,
+        delete_identity_document,
+        delete_identity_documents_for_user,
+        get_all_encodings,
+        get_all_users,
+        get_db_connection,
+        get_identity_document,
+        get_identity_document_by_key,
+        get_logs,
+        get_metrics,
+        get_user_by_email,
+        get_user_by_approval_token,
+        init_db,
+        log_event,
+        list_identity_documents,
+        save_user,
+        set_admin_verified,
+        upsert_identity_document,
+        update_user_blockchain_status,
+        update_user_login,
+    )
+    from . import email_service
+    from .email_service import send_registration_email_async
+    from .face_auth import analyze_face, compare_face, decode_image, find_matching_face
+    from .schemas import (
+        CapturePayload,
+        LoginPayload,
+        RegisterPayload,
+        AdminRegisterPayload,
+        AdminLoginPayload,
+        validation_errors,
+    )
+else:
+    from blockchain import BlockchainClient
+    from database import (
+        clear_all_logs,
+        clear_all_users,
+        delete_user_by_email,
+        delete_identity_document,
+        delete_identity_documents_for_user,
+        get_all_encodings,
+        get_all_users,
+        get_db_connection,
+        get_identity_document,
+        get_identity_document_by_key,
+        get_logs,
+        get_metrics,
+        get_user_by_email,
+        get_user_by_approval_token,
+        init_db,
+        log_event,
+        list_identity_documents,
+        save_user,
+        set_admin_verified,
+        upsert_identity_document,
+        update_user_blockchain_status,
+        update_user_login,
+    )
+    import email_service
+    from email_service import send_registration_email_async
+    from face_auth import analyze_face, compare_face, decode_image, find_matching_face
+    from schemas import CapturePayload, LoginPayload, RegisterPayload, AdminRegisterPayload, AdminLoginPayload, validation_errors
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
 CORS(app)

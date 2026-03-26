@@ -2,7 +2,7 @@ flask
 flask-cors
 python-dotenv
 PyJWT
-opencv-python
+opencv-python-headless
 numpy
 web3
 pydantic

@@ -4,8 +4,12 @@ import sqlite3
 from datetime import datetime, timezone
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "..", "database", "users.db")
-ADMIN_DB_PATH = os.path.join(BASE_DIR, "..", "database", "admins.db")
+DEFAULT_DB_DIR = os.path.join(BASE_DIR, "..", "database")
+RUNTIME_DB_DIR = os.getenv("SQLITE_DB_DIR") or (
+    "/tmp/secure_identity_system" if os.getenv("VERCEL") else DEFAULT_DB_DIR
+)
+DB_PATH = os.path.join(RUNTIME_DB_DIR, "users.db")
+ADMIN_DB_PATH = os.path.join(RUNTIME_DB_DIR, "admins.db")
 
 
 def utc_now_iso():
