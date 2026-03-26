@@ -8,6 +8,7 @@ from web3 import Web3
 GANACHE_URL = os.getenv("GANACHE_URL", "http://127.0.0.1:7545")
 ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 CONTRACT_ADDRESS = os.getenv("CONTRACT_ADDRESS", ZERO_ADDRESS)
+BLOCKCHAIN_PRIVATE_KEY = os.getenv("BLOCKCHAIN_PRIVATE_KEY", "").strip()
 
 FALLBACK_CONTRACT_ABI = [
     {
@@ -65,10 +66,12 @@ class BlockchainClient:
     def __init__(self, rpc_url=GANACHE_URL, contract_address=CONTRACT_ADDRESS):
         self.rpc_url = rpc_url
         self.contract_address = contract_address
+        self.private_key = str(BLOCKCHAIN_PRIVATE_KEY or "").strip()
         self.web3 = Web3(Web3.HTTPProvider(self.rpc_url))
         self.abi = _load_contract_abi()
         self.contract = None
         self.account = None
+        self.signer_mode = "none"
         self.owner = None
         self.last_error = None
         self.deployed = False
@@ -80,6 +83,7 @@ class BlockchainClient:
     def _update_from_env(self):
         self.rpc_url = os.getenv("GANACHE_URL", self.rpc_url)
         self.contract_address = os.getenv("CONTRACT_ADDRESS", self.contract_address)
+        self.private_key = str(os.getenv("BLOCKCHAIN_PRIVATE_KEY", self.private_key) or "").strip()
 
     def _connect(self):
         logger = logging.getLogger(__name__)
@@ -90,6 +94,7 @@ class BlockchainClient:
             self.block_number = None
             self.write_ready = False
             self.owner = None
+            self.signer_mode = "none"
 
             if not self.web3.is_connected():
                 self.last_error = "RPC connection unavailable."
@@ -111,29 +116,45 @@ class BlockchainClient:
                 self.account = None
                 return
 
-            accounts = self.web3.eth.accounts
-            if not accounts:
-                self.last_error = "No blockchain accounts available."
-                self.contract = None
-                self.account = None
-                return
-
-            index_raw = os.getenv("BLOCKCHAIN_ACCOUNT_INDEX", "0")
-            try:
-                index = int(str(index_raw).strip())
-            except Exception:
-                index = 0
-            if index < 0 or index >= len(accounts):
-                self.last_error = (
-                    f"BLOCKCHAIN_ACCOUNT_INDEX={index} is out of range for this RPC node. "
-                    f"Available accounts: {len(accounts)}."
-                )
-                self.contract = None
-                self.account = None
-                return
-
-            self.account = accounts[index]
             self.contract = self.web3.eth.contract(address=checksum_address, abi=self.abi)
+
+            if self.private_key:
+                try:
+                    signer = self.web3.eth.account.from_key(self.private_key)
+                    self.account = Web3.to_checksum_address(signer.address)
+                    self.signer_mode = "private_key"
+                except Exception as exc:
+                    self.last_error = f"Invalid BLOCKCHAIN_PRIVATE_KEY: {exc}"
+                    self.contract = None
+                    self.account = None
+                    return
+            else:
+                accounts = self.web3.eth.accounts
+                if not accounts:
+                    self.last_error = (
+                        "No blockchain accounts available. "
+                        "Set BLOCKCHAIN_PRIVATE_KEY for hosted RPC providers."
+                    )
+                    self.contract = None
+                    self.account = None
+                    return
+
+                index_raw = os.getenv("BLOCKCHAIN_ACCOUNT_INDEX", "0")
+                try:
+                    index = int(str(index_raw).strip())
+                except Exception:
+                    index = 0
+                if index < 0 or index >= len(accounts):
+                    self.last_error = (
+                        f"BLOCKCHAIN_ACCOUNT_INDEX={index} is out of range for this RPC node. "
+                        f"Available accounts: {len(accounts)}."
+                    )
+                    self.contract = None
+                    self.account = None
+                    return
+
+                self.account = Web3.to_checksum_address(accounts[index])
+                self.signer_mode = "rpc_account"
             try:
                 self.chain_id = int(self.web3.eth.chain_id)
             except Exception:
@@ -150,10 +171,16 @@ class BlockchainClient:
                     self.owner = owner
                     if owner.lower() != self.account.lower():
                         write_ready = False
-                        self.last_error = (
-                            "Connected, but the selected signer account does not match the contract owner. "
-                            "Deploy the contract from account[0] or set BLOCKCHAIN_ACCOUNT_INDEX to the deployer index."
-                        )
+                        if self.signer_mode == "private_key":
+                            self.last_error = (
+                                "Connected, but BLOCKCHAIN_PRIVATE_KEY does not match the contract owner. "
+                                "Use the deployer wallet private key."
+                            )
+                        else:
+                            self.last_error = (
+                                "Connected, but the selected signer account does not match the contract owner. "
+                                "Deploy the contract from account[0] or set BLOCKCHAIN_ACCOUNT_INDEX to the deployer index."
+                            )
             except Exception:
                 pass
             self.write_ready = write_ready
@@ -171,6 +198,7 @@ class BlockchainClient:
         except Exception as exc:
             self.contract = None
             self.account = None
+            self.signer_mode = "none"
             self.last_error = str(exc)
 
     def refresh(self):
@@ -178,6 +206,7 @@ class BlockchainClient:
         self.web3 = Web3(Web3.HTTPProvider(self.rpc_url))
         self.contract = None
         self.account = None
+        self.signer_mode = "none"
         self._connect()
 
     def is_ready(self):
@@ -212,6 +241,7 @@ class BlockchainClient:
             "rpc_url": self.rpc_url,
             "contract_address": None if not configured else self.contract_address,
             "account": self.account,
+            "signer_mode": self.signer_mode,
             "deployed": bool(self.deployed),
             "write_ready": bool(self.write_ready),
             "owner": self.owner,
@@ -228,9 +258,48 @@ class BlockchainClient:
         try:
             user_key = Web3.to_bytes(hexstr=user_key_hex)
             identity_hash = Web3.to_bytes(hexstr=identity_hash_hex)
-            tx_hash = self.contract.functions.setIdentity(user_key, identity_hash).transact(
-                {"from": self.account}
-            )
+            if self.signer_mode == "private_key" and self.private_key:
+                nonce = self.web3.eth.get_transaction_count(self.account, "pending")
+                tx_params = {
+                    "from": self.account,
+                    "nonce": nonce,
+                    "chainId": int(self.web3.eth.chain_id),
+                }
+
+                try:
+                    gas_estimate = self.contract.functions.setIdentity(user_key, identity_hash).estimate_gas(
+                        {"from": self.account}
+                    )
+                    tx_params["gas"] = max(int(gas_estimate * 1.2), 210000)
+                except Exception:
+                    tx_params["gas"] = 300000
+
+                try:
+                    latest_block = self.web3.eth.get_block("latest")
+                    base_fee = latest_block.get("baseFeePerGas") if hasattr(latest_block, "get") else None
+                except Exception:
+                    base_fee = None
+
+                if base_fee is not None:
+                    try:
+                        priority_fee = int(self.web3.eth.max_priority_fee)
+                    except Exception:
+                        priority_fee = int(Web3.to_wei(2, "gwei"))
+                    tx_params["maxPriorityFeePerGas"] = max(priority_fee, 1)
+                    tx_params["maxFeePerGas"] = int(base_fee) * 2 + tx_params["maxPriorityFeePerGas"]
+                else:
+                    tx_params["gasPrice"] = int(self.web3.eth.gas_price)
+
+                tx = self.contract.functions.setIdentity(user_key, identity_hash).build_transaction(tx_params)
+                signed = self.web3.eth.account.sign_transaction(tx, private_key=self.private_key)
+                raw_tx = getattr(signed, "raw_transaction", None) or getattr(signed, "rawTransaction", None)
+                if raw_tx is None:
+                    raise ValueError("Failed to sign transaction payload.")
+                tx_hash = self.web3.eth.send_raw_transaction(raw_tx)
+            else:
+                tx_hash = self.contract.functions.setIdentity(user_key, identity_hash).transact(
+                    {"from": self.account}
+                )
             self.last_error = None
             return tx_hash.hex()
         except Exception as exc:

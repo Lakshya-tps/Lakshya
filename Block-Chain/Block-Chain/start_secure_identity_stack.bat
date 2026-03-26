@@ -7,10 +7,12 @@ set "HOST=127.0.0.1"
 set "CHAIN_PORT=8545"
 set "CHAIN_URL=http://%HOST%:%CHAIN_PORT%"
 set "POWERSHELL=%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe"
+set "NODE_EXE=node"
 set "APP_PORT=5055"
 set "APP_URL=http://%HOST%:%APP_PORT%"
 if exist "D:\\nodejs\\node.exe" (
   set "PATH=D:\\nodejs;%PATH%"
+  set "NODE_EXE=D:\\nodejs\\node.exe"
 )
 
 echo.
@@ -21,10 +23,8 @@ echo.
 
 rem 1) Ensure the Hardhat RPC is listening.
 set "CHAIN_READY="
-if exist "%POWERSHELL%" (
-  "%POWERSHELL%" -NoProfile -Command "try { $c = New-Object Net.Sockets.TcpClient; $c.Connect('%HOST%', %CHAIN_PORT%); $c.Close(); exit 0 } catch { exit 1 }" >nul 2>nul
-  if not errorlevel 1 set "CHAIN_READY=1"
-)
+call :check_port %HOST% %CHAIN_PORT%
+if not errorlevel 1 set "CHAIN_READY=1"
 
 if not defined CHAIN_READY (
   echo Starting Hardhat node...
@@ -33,12 +33,10 @@ if not defined CHAIN_READY (
 
   echo Waiting for Hardhat RPC on %HOST%:%CHAIN_PORT% ...
   for /l %%I in (1,1,90) do (
-    if exist "%POWERSHELL%" (
-      "%POWERSHELL%" -NoProfile -Command "try { $c = New-Object Net.Sockets.TcpClient; $c.Connect('%HOST%', %CHAIN_PORT%); $c.Close(); exit 0 } catch { exit 1 }" >nul 2>nul
-      if not errorlevel 1 (
-        set "CHAIN_READY=1"
-        goto :chain_ready
-      )
+    call :check_port %HOST% %CHAIN_PORT%
+    if not errorlevel 1 (
+      set "CHAIN_READY=1"
+      goto :chain_ready
     )
     if exist "%SystemRoot%\\System32\\timeout.exe" (
       "%SystemRoot%\\System32\\timeout.exe" /t 1 > nul
@@ -66,10 +64,8 @@ rem 3) Start Flask server + wait until it's listening
 echo Starting Flask server...
 cd /d "%~dp0"
 set "APP_READY="
-if exist "%POWERSHELL%" (
-  "%POWERSHELL%" -NoProfile -Command "try { $c = New-Object Net.Sockets.TcpClient; $c.Connect('%HOST%', %APP_PORT%); $c.Close(); exit 0 } catch { exit 1 }" >nul 2>nul
-  if not errorlevel 1 set "APP_READY=1"
-)
+call :check_port %HOST% %APP_PORT%
+if not errorlevel 1 set "APP_READY=1"
 
 if not defined APP_READY (
   set "PORT=%APP_PORT%"
@@ -80,12 +76,10 @@ if not defined APP_READY (
 if not defined APP_READY (
   echo Waiting for Secure Identity Server on %HOST%:%APP_PORT% ...
   for /l %%I in (1,1,90) do (
-    if exist "%POWERSHELL%" (
-      "%POWERSHELL%" -NoProfile -Command "try { $c = New-Object Net.Sockets.TcpClient; $c.Connect('%HOST%', %APP_PORT%); $c.Close(); exit 0 } catch { exit 1 }" >nul 2>nul
-      if not errorlevel 1 (
-        set "APP_READY=1"
-        goto :app_ready
-      )
+    call :check_port %HOST% %APP_PORT%
+    if not errorlevel 1 (
+      set "APP_READY=1"
+      goto :app_ready
     )
     if exist "%SystemRoot%\\System32\\timeout.exe" (
       "%SystemRoot%\\System32\\timeout.exe" /t 1 > nul
@@ -105,3 +99,19 @@ start "" "%APP_URL%/login"
 
 echo.
 echo Done. If the dashboard shows "Not Connected", refresh once and check the error text under the badge.
+exit /b 0
+
+:check_port
+set "CHECK_HOST=%~1"
+set "CHECK_PORT=%~2"
+if exist "%POWERSHELL%" (
+  "%POWERSHELL%" -NoProfile -Command "try { $c = New-Object Net.Sockets.TcpClient; $c.Connect('%CHECK_HOST%', %CHECK_PORT%); $c.Close(); exit 0 } catch { exit 1 }" >nul 2>nul
+  exit /b %errorlevel%
+)
+
+if not exist "%NODE_EXE%" (
+  exit /b 1
+)
+
+"%NODE_EXE%" -e "const n=require('net');const h=process.argv[1];const p=Number(process.argv[2]);const s=n.createConnection({host:h,port:p},()=>{s.end();process.exit(0)});s.on('error',()=>process.exit(1));setTimeout(()=>process.exit(1),1000);" "%CHECK_HOST%" "%CHECK_PORT%" >nul 2>nul
+exit /b %errorlevel%

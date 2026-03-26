@@ -67,6 +67,7 @@ One-command start from the repo root
 
 Optional blockchain configuration
 - Add `GANACHE_URL` and `CONTRACT_ADDRESS` in `secure_identity_system\.env`
+- For hosted RPC providers (Vercel, Alchemy, Infura), also set `BLOCKCHAIN_PRIVATE_KEY`
 - Defaults to `http://127.0.0.1:7545` and a zero address until you update them
 - Keep the ABI in `backend/blockchain.py` aligned with your deployed contract
  - If you deploy with the bundled Hardhat scripts, `GANACHE_URL` is set to `http://127.0.0.1:8545`
