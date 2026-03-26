@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% set page_name = "admin_register" %}
+
+{% block title %}Register Administrator | Secure Identity{% endblock %}
+
+{% block content %}
+  <section class="flow-shell">
+    <div class="flow-intro reveal">
+      <p class="eyebrow">Admin Register</p>
+      <h1>Register a new Admin identity.</h1>
+      <p class="lead">
+        Requires Master Admin email verification. Please submit your name, email, password, and facial scan.
+      </p>
+      <article class="signal-card">
+        <strong>Security Notice</strong>
+        <p>Your registration will NOT be active until standard approval is granted.</p>
+      </article>
+    </div>
+
+    <section class="workspace-panel reveal stagger-1">
+      <div class="workspace-header">
+        <div>
+          <p class="panel-kicker">Admin Flow</p>
+          <h2>Capture and enroll</h2>
+        </div>
+        <span class="badge neutral" id="admin-register-camera-state">Camera idle</span>
+      </div>
+
+      <form id="admin-register-form" class="workspace-grid">
+        <div class="field-grid">
+          <label class="field">
+            <span>Full name</span>
+            <input id="name" type="text" placeholder="Ada Lovelace" required />
+          </label>
+          <label class="field">
+            <span>Email address</span>
+            <input id="email" type="email" placeholder="ada@example.com" required />
+          </label>
+          <label class="field" style="grid-column: span 2;">
+            <span>Password (6+ chars)</span>
+            <input id="password" type="password" placeholder="Secure Password" required minlength="6"/>
+          </label>
+        </div>
+
+        <div class="capture-grid">
+          <div class="camera-panel">
+            <video id="admin-register-video" autoplay playsinline muted></video>
+            <canvas id="admin-register-canvas" hidden></canvas>
+            <div class="capture-actions">
+              <button type="button" class="btn secondary" id="admin-register-start">Start camera</button>
+              <button type="button" class="btn tertiary" id="admin-register-capture">Capture frame</button>
+              <button type="button" class="btn tertiary" id="admin-register-retake">Retake</button>
+              <button type="button" class="btn tertiary" id="admin-register-stop">Stop camera</button>
+            </div>
+          </div>
+
+          <div class="capture-sidecar">
+            <figure class="preview-card">
+              <img id="admin-register-preview" alt="Captured face preview" />
+            </figure>
+
+            <section class="quality-card">
+              <div class="quality-head">
+                <div>
+                  <strong id="admin-register-quality-label">No capture yet</strong>
+                </div>
+                <span class="quality-score" id="admin-register-quality-score">--</span>
+              </div>
+              <div class="quality-bar">
+                <span id="admin-register-quality-fill"></span>
+              </div>
+              <ul class="hint-list" id="admin-register-quality-issues">
+                <li>Capture a frame to analyze blur, lighting, and framing.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="status-panel" id="admin-register-status">Ready when you are.</div>
+          <div class="response-panel" id="admin-register-result">
+            Identity details will appear here after enrollment request is accepted.
+          </div>
+        </div>
+
+        <button type="submit" class="btn primary wide">Request Admin Access</button>
+      </form>
+    </section>
+  </section>
+{% endblock %}

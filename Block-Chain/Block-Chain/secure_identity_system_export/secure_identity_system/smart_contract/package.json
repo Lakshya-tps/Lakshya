@@ -1,0 +1,10 @@
+{
+  "name": "secure-identity-contracts",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "ethers": "^6.10.0",
+    "hardhat": "^2.22.2"
+  }
+}

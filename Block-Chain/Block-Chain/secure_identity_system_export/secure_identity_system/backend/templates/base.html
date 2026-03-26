@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Secure Identity Platform{% endblock %}</title>
+    <meta
+      name="description"
+      content="Modern identity authentication with face capture analytics and blockchain-backed verification."
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body data-page="{{ page_name | default('app') }}">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <div class="ambient ambient-three"></div>
+    <div class="grain"></div>
+
+    <div class="site-header-shell">
+      <header class="site-header">
+        <a class="brand" href="/">
+          <span class="brand-mark">SI</span>
+          <span class="brand-copy">
+            <strong>Secure Identity</strong>
+            <small>Private identity verification</small>
+          </span>
+        </a>
+
+        <nav class="site-nav">
+          {% if (page_name | default('')) and (page_name | default('')).startswith('admin') %}
+            <a href="/" class="active">Exit Admin</a>
+          {% elif page_name == 'profile' %}
+            <a href="#" class="active" id="btn-sign-out">Sign Out</a>
+          {% else %}
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Overview</a>
+            <a href="/register" class="{% if request.path == '/register' %}active{% endif %}">Register</a>
+            <a href="/login" class="{% if request.path == '/login' %}active{% endif %}">Authenticate</a>
+          {% endif %}
+        </nav>
+      </header>
+    </div>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <div>
+        <strong>Secure Identity Platform</strong>
+        <p>Face capture, identity hashing, and optional blockchain verification.</p>
+      </div>
+      <div class="footer-meta">
+        <span>Flask + OpenCV + Web3</span>
+        <span>Designed for clean desktop and mobile capture flows</span>
+      </div>
+    </footer>
+
+    <script type="module" src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>

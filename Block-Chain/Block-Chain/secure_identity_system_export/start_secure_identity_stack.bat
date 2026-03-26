@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableExtensions
 
-cd /d "%~dp0"
+cd /d %~dp0
 
 set "HOST=127.0.0.1"
 set "CHAIN_PORT=8545"
@@ -29,7 +29,8 @@ if exist "%POWERSHELL%" (
 if not defined CHAIN_READY (
   echo Starting Hardhat node...
   rem Start the dedicated Hardhat launcher script in a new window.
-  start "Hardhat Node" /D "%~dp0" "%~dp0start_hardhat.bat"
+  rem Use CALL to run the batch file reliably in a new cmd window.
+  start "Hardhat Node" cmd /k call %~dp0start_hardhat.bat
 
   echo Waiting for Hardhat RPC on %HOST%:%CHAIN_PORT% ...
   for /l %%I in (1,1,90) do (
@@ -55,7 +56,7 @@ if not defined CHAIN_READY (
 
 rem 2) Deploy contract to localhost and update secure_identity_system\.env
 echo Deploying contract (updates secure_identity_system\.env)...
-cd /d "%~dp0secure_identity_system\smart_contract"
+cd /d %~dp0secure_identity_system\smart_contract
 call npx hardhat run scripts\\deploy.js --network localhost
 if errorlevel 1 (
   echo Contract deployment failed. Check the Hardhat Node window and rerun.
@@ -64,7 +65,7 @@ if errorlevel 1 (
 
 rem 3) Start Flask server + wait until it's listening
 echo Starting Flask server...
-cd /d "%~dp0"
+cd /d %~dp0
 set "APP_READY="
 if exist "%POWERSHELL%" (
   "%POWERSHELL%" -NoProfile -Command "try { $c = New-Object Net.Sockets.TcpClient; $c.Connect('%HOST%', %APP_PORT%); $c.Close(); exit 0 } catch { exit 1 }" >nul 2>nul
@@ -72,9 +73,7 @@ if exist "%POWERSHELL%" (
 )
 
 if not defined APP_READY (
-  set "PORT=%APP_PORT%"
-  set "DEBUG=0"
-  start "Secure Identity Server" /D "%~dp0secure_identity_system" "%~dp0secure_identity_system\\start_server.bat"
+  start "Secure Identity Server" cmd /k "set HOST=%HOST% && set PORT=%APP_PORT% && set DEBUG=0 && call %~dp0secure_identity_system\\start_server.bat"
 )
 
 if not defined APP_READY (
