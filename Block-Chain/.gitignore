@@ -1,0 +1,31 @@
+# Python virtual environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Secrets and local environment
+.env
+*.env
+
+# Local databases and uploads
+*.db
+backend/uploads/
+uploads/
+
+# Node/Hardhat build artifacts
+node_modules/
+artifacts/
+cache/
+.hardhat/
+.hardhat-local/
+
+# Logs and temp files
+*.log
+*.out
+*.tmp
+
+# IDE
+.vscode/

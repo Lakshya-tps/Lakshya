@@ -1,0 +1,9 @@
+{
+  "include": [
+    "secure_identity_system/backend",
+    "secure_identity_system/tests"
+  ],
+  "extraPaths": [
+    "secure_identity_system/backend"
+  ]
+}

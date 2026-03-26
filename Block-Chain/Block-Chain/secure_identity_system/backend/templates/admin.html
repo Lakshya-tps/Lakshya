@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% set page_name = "admin" %}
+
+{% block title %}Admin Center | Secure Identity{% endblock %}
+
+{% block content %}
+  <section class="dashboard-hero reveal">
+    <div>
+      <p class="eyebrow">Admin Center</p>
+      <h1>System operations and telemetry.</h1>
+      <p class="lead">
+        Review enrollment quality, authentication outcomes, and whether the
+        blockchain layer is actually aligned with the local identity store.
+      </p>
+      <p class="refresh-note" id="dashboard-refresh-note">Waiting for first dashboard sync.</p>
+    </div>
+    <button class="btn secondary" id="dashboard-refresh" type="button">Refresh data</button>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="stat-panel reveal">
+      <span>Registered identities</span>
+      <strong data-metric="total-users">--</strong>
+      <small>Total user records in the local identity store.</small>
+    </article>
+    <article class="stat-panel reveal stagger-1">
+      <span>Authentication success</span>
+      <strong data-metric="success-rate">--</strong>
+      <small>Successful login attempts divided by all login attempts.</small>
+    </article>
+    <article class="stat-panel reveal stagger-2">
+      <span>Chain synced identities</span>
+      <strong data-metric="synced-users">--</strong>
+      <small>Users whose local hash currently matches the blockchain record.</small>
+    </article>
+    <article class="stat-panel reveal stagger-3">
+      <span>Average capture score</span>
+      <strong data-metric="quality">--</strong>
+      <small>Mean registration capture quality across enrolled identities.</small>
+    </article>
+  </section>
+
+  <section class="ops-grid">
+    <article class="ops-panel reveal">
+      <div class="panel-header">
+        <div>
+          <p class="panel-kicker">Network state</p>
+          <h2>Blockchain connection</h2>
+        </div>
+        <span class="badge neutral" id="dashboard-chain-badge">Checking</span>
+      </div>
+      <dl class="detail-grid">
+        <div>
+          <dt>RPC endpoint</dt>
+          <dd id="dashboard-rpc-url">--</dd>
+        </div>
+        <div>
+          <dt>Contract address</dt>
+          <dd id="dashboard-contract-address">--</dd>
+        </div>
+        <div>
+          <dt>Account</dt>
+          <dd id="dashboard-account">--</dd>
+        </div>
+        <div>
+          <dt>Last error</dt>
+          <dd id="dashboard-chain-error">None</dd>
+        </div>
+      </dl>
+    </article>
+
+    <article class="ops-panel reveal stagger-1">
+      <div class="panel-header">
+        <div>
+          <p class="panel-kicker">Audit focus</p>
+          <h2>Recent signals</h2>
+        </div>
+      </div>
+      <ul class="signal-list" id="dashboard-insights">
+        <li>Metrics will populate after the dashboard loads.</li>
+      </ul>
+    </article>
+
+    <article class="ops-panel reveal stagger-2">
+      <div class="panel-header">
+        <div>
+          <p class="panel-kicker">Admin tools</p>
+          <h2>System settings</h2>
+        </div>
+      </div>
+      <div style="margin-top: 1.5rem;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-heading);">SMTP Configuration</h3>
+        <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-body);">Update credentials dynamically.</p>
+        <form id="smtp-form" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem;">
+          <input type="email" id="smtp-email" placeholder="SMTP Email (e.g. gmail)" required style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-heading);">
+          <input type="password" id="smtp-password" placeholder="App Password" required style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-heading);">
+          <button type="submit" class="btn" style="padding: 8px; font-size: 0.9rem; margin-top: 0.5rem;">Save config</button>
+        </form>
+
+        <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #ff6b6b;">Danger Zone</h3>
+        <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-body);">Permanently delete all internal tracking data.</p>
+        <div style="display: flex; gap: 1rem;">
+          <button type="button" class="btn tertiary" id="clear-logs-btn" style="flex: 1; border: 1px solid rgba(255,100,100,0.3); color: #ff6b6b;">Clear Logs</button>
+          <button type="button" class="btn tertiary" id="clear-users-btn" style="flex: 1; border: 1px solid rgba(255,100,100,0.3); color: #ff6b6b;">Clear Users</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="ops-panel reveal stagger-3">
+      <div class="panel-header">
+        <div>
+          <p class="panel-kicker">My Identity</p>
+          <h2>Self-Management</h2>
+        </div>
+      </div>
+      <div style="margin-top: 1.5rem;">
+        <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-heading);">Change Password</h3>
+        <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-body);">Update your administrative login password.</p>
+        <form id="admin-password-form" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 2rem;">
+          <input type="password" id="new-admin-password" placeholder="New Password (6+ chars)" minlength="6" required style="padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--panel-bg); color: var(--text-heading);">
+          <button type="submit" class="btn" style="padding: 8px; font-size: 0.9rem; margin-top: 0.5rem;">Update Password</button>
+        </form>
+
+        <h3 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: #ff6b6b;">Revoke Admin Access</h3>
+        <p style="font-size: 0.8rem; margin-bottom: 1rem; color: var(--text-body);">Permanently delete your own administrative biometric identity and credentials.</p>
+        <button type="button" class="btn tertiary" id="delete-self-btn" style="width: 100%; border: 1px solid rgba(255,100,100,0.3); color: #ff6b6b;">Delete My Account</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="table-section reveal">
+    <div class="panel-header">
+      <div>
+        <p class="panel-kicker">Registered identities</p>
+        <h2>Enrollment roster</h2>
+      </div>
+      <span class="badge neutral" id="dashboard-user-count">--</span>
+    </div>
+    <p class="refresh-note">Latest registered identities with their enrollment quality and chain status.</p>
+    <div class="table-wrap">
+      <table class="data-table" id="dashboard-users-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Registered</th>
+            <th>Last login</th>
+            <th>Quality</th>
+            <th>Chain</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="dashboard-users-body">
+          <tr>
+            <td colspan="7">Loading registered identities...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

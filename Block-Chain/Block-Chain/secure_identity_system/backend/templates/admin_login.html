@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% set page_name = "admin_login" %}
+
+{% block title %}Admin Login | Secure Identity{% endblock %}
+
+{% block content %}
+  <section class="flow-shell">
+    <div class="flow-intro reveal">
+      <p class="eyebrow">Admin Authenticate</p>
+      <h1>2-Factor Admin Authentication.</h1>
+      <p class="lead">
+        Administrators must submit both strong typed credentials and a live biometric face capture to access the dashboard.
+      </p>
+    </div>
+
+    <section class="workspace-panel reveal stagger-1">
+      <div class="workspace-header">
+        <div>
+          <p class="panel-kicker">Login flow</p>
+          <h2>Credentials & Biometrics</h2>
+        </div>
+        <span class="badge neutral" id="admin-login-camera-state">Camera idle</span>
+      </div>
+
+      <form id="admin-login-form" class="workspace-grid">
+        <div class="field-grid">
+          <label class="field">
+            <span>Email address</span>
+            <input id="admin-login-email" type="email" placeholder="ada@example.com" required />
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input id="admin-login-password" type="password" placeholder="••••••••" required />
+          </label>
+        </div>
+
+        <div class="capture-grid">
+          <div class="camera-panel">
+            <video id="admin-login-video" autoplay playsinline muted></video>
+            <canvas id="admin-login-canvas" hidden></canvas>
+            <div class="capture-actions">
+              <button type="button" class="btn secondary" id="admin-login-start">Start camera</button>
+              <button type="button" class="btn tertiary" id="admin-login-capture">Capture frame</button>
+              <button type="button" class="btn tertiary" id="admin-login-retake">Retake</button>
+              <button type="button" class="btn tertiary" id="admin-login-stop">Stop camera</button>
+            </div>
+          </div>
+
+          <div class="capture-sidecar">
+            <figure class="preview-card">
+              <img id="admin-login-preview" alt="Captured face preview" />
+            </figure>
+
+            <section class="quality-card">
+              <div class="quality-head">
+                <div>
+                  <strong id="admin-login-quality-label">No capture yet</strong>
+                </div>
+                <span class="quality-score" id="admin-login-quality-score">--</span>
+              </div>
+              <div class="quality-bar">
+                <span id="admin-login-quality-fill"></span>
+              </div>
+              <ul class="hint-list" id="admin-login-quality-issues">
+                <li>Capture a frame to analyze blur, lighting, and framing.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="status-panel" id="admin-login-status">Ready to authenticate.</div>
+          <div class="response-panel" id="admin-login-result">
+            Match confidence and verification state will appear here after authentication.
+          </div>
+        </div>
+
+        <button type="submit" class="btn primary wide">Verify 2FA Identity</button>
+      </form>
+    </section>
+  </section>
+{% endblock %}

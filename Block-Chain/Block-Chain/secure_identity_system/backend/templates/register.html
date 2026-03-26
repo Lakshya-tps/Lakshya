@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% set page_name = "register" %}
+
+{% block title %}Register Identity | Secure Identity{% endblock %}
+
+{% block content %}
+  <section class="flow-shell">
+    <div class="flow-intro reveal">
+      <p class="eyebrow">Register</p>
+      <h1>Register a new digital identity.</h1>
+      <p class="lead">
+        The capture must clear the quality gate before the identity hash is stored
+        locally and optionally anchored to the blockchain.
+      </p>
+      <article class="signal-card">
+        <strong>Best result</strong>
+        <p>Use one face, soft front lighting, and keep your face centered in frame.</p>
+      </article>
+    </div>
+
+    <section class="workspace-panel reveal stagger-1">
+      <div class="workspace-header">
+        <div>
+          <p class="panel-kicker">Register flow</p>
+          <h2>Capture and enroll</h2>
+        </div>
+        <span class="badge neutral" id="register-camera-state">Camera idle</span>
+      </div>
+
+      <form id="register-form" class="workspace-grid">
+        <div class="field-grid">
+          <label class="field">
+            <span>Full name</span>
+            <input id="name" type="text" placeholder="Ada Lovelace" required />
+          </label>
+          <label class="field">
+            <span>Email address</span>
+            <input id="email" type="email" placeholder="ada@example.com" required />
+          </label>
+        </div>
+
+        <div class="capture-grid">
+          <div class="camera-panel">
+            <video id="register-video" autoplay playsinline muted></video>
+            <canvas id="register-canvas" hidden></canvas>
+            <div class="capture-actions">
+              <button type="button" class="btn secondary" id="register-start">Start camera</button>
+              <button type="button" class="btn tertiary" id="register-capture">Capture frame</button>
+              <button type="button" class="btn tertiary" id="register-retake">Retake</button>
+              <button type="button" class="btn tertiary" id="register-stop">Stop camera</button>
+            </div>
+          </div>
+
+          <div class="capture-sidecar">
+            <figure class="preview-card">
+              <img id="register-preview" alt="Captured face preview" />
+            </figure>
+
+            <section class="quality-card">
+              <div class="quality-head">
+                <div>
+                  <strong id="register-quality-label">No capture yet</strong>
+                </div>
+                <span class="quality-score" id="register-quality-score">--</span>
+              </div>
+              <div class="quality-bar">
+                <span id="register-quality-fill"></span>
+              </div>
+              <ul class="hint-list" id="register-quality-issues">
+                <li>Capture a frame to analyze blur, lighting, and framing.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="status-panel" id="register-status">Ready when you are.</div>
+          <div class="response-panel" id="register-result">
+            Identity and blockchain details will appear here after enrollment.
+          </div>
+        </div>
+
+        <button type="submit" class="btn primary wide">Register identity</button>
+      </form>
+    </section>
+  </section>
+{% endblock %}

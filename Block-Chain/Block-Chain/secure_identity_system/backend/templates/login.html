@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% set page_name = "login" %}
+
+{% block title %}Authenticate | Secure Identity{% endblock %}
+
+{% block content %}
+  <section class="flow-shell">
+    <div class="flow-intro reveal">
+      <p class="eyebrow">Authenticate</p>
+      <h1>Authenticate against the registered identity profile.</h1>
+      <p class="lead">
+        The authentication flow follows the use-case path directly: capture face,
+        verify identity, retrieve the stored hash, and then confirm the result.
+      </p>
+      <div class="signal-stack">
+        <article class="signal-card">
+          <strong>Authentication steps</strong>
+          <ul class="signal-list compact">
+            <li>Enter the registered email address.</li>
+            <li>Start the camera and capture one clear frame.</li>
+            <li>Wait for quality check and face comparison.</li>
+            <li>Review verification and blockchain state.</li>
+          </ul>
+        </article>
+        <article class="signal-card">
+          <strong>Best result</strong>
+          <p>Use the same lighting conditions as registration and keep only one face in view.</p>
+        </article>
+      </div>
+    </div>
+
+    <section class="workspace-panel reveal stagger-1">
+      <div class="workspace-header">
+        <div>
+          <p class="panel-kicker">Login flow</p>
+          <h2>Capture and verify</h2>
+        </div>
+        <span class="badge neutral" id="login-camera-state">Camera idle</span>
+      </div>
+
+      <form id="login-form" class="workspace-grid">
+        <div class="field-grid">
+          <label class="field">
+            <span>Email address</span>
+            <input id="login-email" type="email" placeholder="ada@example.com" required />
+          </label>
+        </div>
+
+        <div class="capture-grid">
+          <div class="camera-panel">
+            <video id="login-video" autoplay playsinline muted></video>
+            <canvas id="login-canvas" hidden></canvas>
+            <div class="capture-actions">
+              <button type="button" class="btn secondary" id="login-start">Start camera</button>
+              <button type="button" class="btn tertiary" id="login-capture">Capture frame</button>
+              <button type="button" class="btn tertiary" id="login-retake">Retake</button>
+              <button type="button" class="btn tertiary" id="login-stop">Stop camera</button>
+            </div>
+          </div>
+
+          <div class="capture-sidecar">
+            <figure class="preview-card">
+              <img id="login-preview" alt="Captured face preview" />
+            </figure>
+
+            <section class="quality-card">
+              <div class="quality-head">
+                <div>
+                  <strong id="login-quality-label">No capture yet</strong>
+                </div>
+                <span class="quality-score" id="login-quality-score">--</span>
+              </div>
+              <div class="quality-bar">
+                <span id="login-quality-fill"></span>
+              </div>
+              <ul class="hint-list" id="login-quality-issues">
+                <li>Capture a frame to analyze blur, lighting, and framing.</li>
+              </ul>
+            </section>
+          </div>
+        </div>
+
+        <div class="result-grid">
+          <div class="status-panel" id="login-status">Ready to authenticate.</div>
+          <div class="response-panel" id="login-result">
+            Match confidence and verification state will appear here after authentication.
+          </div>
+        </div>
+
+        <button type="submit" class="btn primary wide">Authenticate identity</button>
+      </form>
+    </section>
+  </section>
+{% endblock %}

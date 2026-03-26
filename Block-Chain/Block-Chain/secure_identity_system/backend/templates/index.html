@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% set page_name = "home" %}
+
+{% block title %}Secure Identity Platform{% endblock %}
+
+{% block content %}
+  <section class="hero-shell" id="home-hero">
+    <div class="hero-copy glass-stage reveal">
+      <p class="eyebrow">Secure Identity</p>
+      <h1>Apple-like clarity for digital identity verification.</h1>
+      <p class="lead">
+        Register with a camera capture, verify against the stored identity profile,
+        and optionally confirm the hash against the blockchain. The interface is now
+        simpler, lighter, and easier to use.
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="/register">Launch registration</a>
+        <a class="btn secondary" href="/login">Run authentication</a>
+        <a class="btn tertiary" href="/admin">Open operations</a>
+      </div>
+    </div>
+
+    <aside class="hero-panel reveal stagger-1">
+      <div class="panel-kicker">Live platform snapshot</div>
+      <div class="hero-metrics">
+        <article class="metric-card">
+          <span>Total identities</span>
+          <strong data-metric="total-users">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>Auth success rate</span>
+          <strong data-metric="success-rate">--</strong>
+        </article>
+        <article class="metric-card">
+          <span>Average capture quality</span>
+          <strong data-metric="quality">--</strong>
+        </article>
+      </div>
+      <div class="hero-status">
+        <span class="status-dot" data-chain-indicator></span>
+        <div>
+          <p class="status-label">Blockchain state</p>
+          <strong data-chain-text>Checking network</strong>
+        </div>
+      </div>
+      <div class="hero-registrations">
+        <div class="panel-header">
+          <p class="status-label">Recent registrations</p>
+          <span class="badge neutral" id="home-user-count">--</span>
+        </div>
+        <ul class="signal-list compact" id="home-registrations">
+          <li>Loading registered identities...</li>
+        </ul>
+      </div>
+      <div class="glass-note">
+        <strong>Diagram fit:</strong>
+        The architecture diagram matches the current flow well. The class diagram is
+        only partial because the backend is module-driven rather than fully OOP.
+      </div>
+    </aside>
+  </section>
+
+  <section class="feature-grid">
+    <article class="feature-panel reveal">
+      <p class="panel-kicker">Capture</p>
+      <h2>Live camera enrollment</h2>
+      <p>Register and authenticate with the same streamlined capture flow.</p>
+    </article>
+    <article class="feature-panel reveal stagger-1">
+      <p class="panel-kicker">Analysis</p>
+      <h2>Quality before acceptance</h2>
+      <p>Blur, lighting, and framing are checked before weak captures are accepted.</p>
+    </article>
+    <article class="feature-panel reveal stagger-2">
+      <p class="panel-kicker">Verification</p>
+      <h2>Hash-aware blockchain state</h2>
+      <p>When available, the chain is used as an extra verification layer rather than a blind write.</p>
+    </article>
+  </section>
+
+  <section class="story-grid">
+    <div class="story-panel reveal">
+      <p class="panel-kicker">Use case overview</p>
+      <h2>How the authentication path works</h2>
+      <ul class="signal-list">
+        <li>Register identity: capture a face, score quality, and create the local identity hash.</li>
+        <li>Store hash: when blockchain is ready, the identity hash is written and later checked again.</li>
+        <li>Authenticate user: a fresh capture is matched against the saved profile before verification state is shown.</li>
+        <li>Retrieve hash: chain state is pulled during verification to detect missing or mismatched records.</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <section class="feature-grid">
+    <article class="feature-panel reveal">
+      <p class="panel-kicker">Step 1</p>
+      <h2>Capture face</h2>
+      <p>The webcam frame is taken locally and checked for blur, lighting, and framing quality.</p>
+    </article>
+    <article class="feature-panel reveal stagger-1">
+      <p class="panel-kicker">Step 2</p>
+      <h2>Match and verify</h2>
+      <p>The fresh face encoding is compared with the stored identity profile before access is accepted.</p>
+    </article>
+    <article class="feature-panel reveal stagger-2">
+      <p class="panel-kicker">Step 3</p>
+      <h2>Check blockchain state</h2>
+      <p>If the chain is online, the stored hash is retrieved and compared against the local record.</p>
+    </article>
+  </section>
+{% endblock %}
